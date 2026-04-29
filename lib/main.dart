@@ -65,19 +65,19 @@ class Responsive extends StatelessWidget {
   });
 
   static bool isMobile(BuildContext context) =>
-      MediaQuery.of(context).size.width < 850;
+      MediaQuery.of(context).size.width < 1000;
   static bool isTablet(BuildContext context) =>
-      MediaQuery.of(context).size.width < 1100 &&
-      MediaQuery.of(context).size.width >= 850;
+      MediaQuery.of(context).size.width < 1200 &&
+      MediaQuery.of(context).size.width >= 1000;
   static bool isDesktop(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 1100;
+      MediaQuery.of(context).size.width >= 1200;
 
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
-    if (width >= 1100) {
+    if (width >= 1200) {
       return desktop;
-    } else if (width >= 850 && tablet != null) {
+    } else if (width >= 1000 && tablet != null) {
       return tablet!;
     } else {
       return mobile;
@@ -201,15 +201,17 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
         ),
         textTheme: GoogleFonts.interTextTheme(),
       ),
-      home: Scaffold(
-        key: _scaffoldKey,
-        drawer: _buildDrawer(),
-        body: _buildPage(),
+      home: Builder(
+        builder: (context) => Scaffold(
+          key: _scaffoldKey,
+          drawer: _buildDrawer(context),
+          body: _buildPage(),
+        ),
       ),
     );
   }
 
-  Widget _buildDrawer() {
+  Widget _buildDrawer(BuildContext context) {
     return Drawer(
       child: Container(
         color: kPrimaryGreen,
@@ -244,14 +246,14 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
                 ),
               ),
             ),
-            _drawerItem(0, 'Home', Icons.home),
-            _drawerItem(1, 'About Us', Icons.info),
-            _drawerItem(2, 'Courses', Icons.book),
-            _drawerItem(3, 'Gallery', Icons.photo_library),
-            _drawerItem(4, 'Contact', Icons.contact_mail),
+            _drawerItem(context, 0, 'Home', Icons.home),
+            _drawerItem(context, 1, 'About Us', Icons.info),
+            _drawerItem(context, 2, 'Courses', Icons.book),
+            _drawerItem(context, 3, 'Gallery', Icons.photo_library),
+            _drawerItem(context, 4, 'Contact', Icons.contact_mail),
             const Divider(color: Colors.white24),
-            _drawerItem(5, 'Donate', Icons.favorite, isSpecial: true),
-            _drawerItem(6, 'Admin', Icons.admin_panel_settings),
+            _drawerItem(context, 5, 'Donate', Icons.favorite, isSpecial: true),
+            _drawerItem(context, 6, 'Admin', Icons.admin_panel_settings),
           ],
         ),
       ),
@@ -259,6 +261,7 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
   }
 
   Widget _drawerItem(
+    BuildContext context,
     int index,
     String title,
     IconData icon, {
@@ -1706,7 +1709,10 @@ class CoursesFeesSection extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: kPrimaryGreen.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(10)),
+                    decoration: BoxDecoration(
+                      color: kPrimaryGreen.withValues(alpha: 0.05),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                     child: Icon(course.icon, color: kPrimaryGreen, size: 28),
                   ),
                   const SizedBox(width: 15),
@@ -1735,26 +1741,40 @@ class CoursesFeesSection extends StatelessWidget {
               const SizedBox(height: 15),
               Text(
                 course.description,
-                style: const TextStyle(color: Colors.black54, fontSize: 14, height: 1.5),
+                style: const TextStyle(
+                  color: Colors.black54,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
               ),
               if (course.subtitles.isNotEmpty) ...[
                 const SizedBox(height: 20),
-                ...course.subtitles.map((sub) => Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Icon(Icons.check_circle, color: kPrimaryGreen, size: 16),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              sub,
-                              style: const TextStyle(color: Colors.black87, fontSize: 13, height: 1.4),
+                ...course.subtitles.map(
+                  (sub) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Icon(
+                          Icons.check_circle,
+                          color: kPrimaryGreen,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            sub,
+                            style: const TextStyle(
+                              color: Colors.black87,
+                              fontSize: 13,
+                              height: 1.4,
                             ),
                           ),
-                        ],
-                      ),
-                    )),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
               const SizedBox(height: 10),
               Text(
@@ -1965,16 +1985,16 @@ class DiscountsSection extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 60),
-          Flex(
-            direction: isMobile ? Axis.vertical : Axis.horizontal,
-            mainAxisAlignment: MainAxisAlignment.center,
+          Wrap(
+            spacing: 20,
+            runSpacing: 15,
+            alignment: WrapAlignment.center,
             children: [
               _noteBox(
                 Icons.info_outline,
                 'Only one discount can be applied per student.',
                 context,
               ),
-              SizedBox(width: isMobile ? 0 : 20, height: isMobile ? 15 : 0),
               _noteBox(
                 Icons.payments_outlined,
                 '50% Advance Fee required to confirm your seat booking.',
@@ -2029,7 +2049,7 @@ class DiscountsSection extends StatelessWidget {
   Widget _noteBox(IconData icon, String text, BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : null,
+      width: isMobile ? double.infinity : 400,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       decoration: BoxDecoration(
         color: Colors.orange.withValues(alpha: 0.05),
@@ -2420,7 +2440,7 @@ class ContactContentSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     image: const DecorationImage(
                       image: NetworkImage(
-                        'https://i.ibb.co/6P0J9K5/map-placeholder.png',
+                        'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&q=80',
                       ),
                       fit: BoxFit.cover,
                     ),
@@ -3538,21 +3558,14 @@ class _AdminPanelState extends State<AdminPanel> {
       ),
       drawer: isMobile
           ? Drawer(
-              child: Container(
-                color: kLightBg,
-                child: _sidebarContent(),
-              ),
+              child: Container(color: kLightBg, child: _sidebarContent()),
             )
           : null,
       body: Row(
         children: [
           // Sidebar (only on desktop)
           if (!isMobile)
-            Container(
-              width: 250,
-              color: kLightBg,
-              child: _sidebarContent(),
-            ),
+            Container(width: 250, color: kLightBg, child: _sidebarContent()),
           // Content
           Expanded(
             child: _activeTab == 0 ? _manageCourses() : _manageGallery(),
