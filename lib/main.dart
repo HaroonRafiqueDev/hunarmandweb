@@ -101,7 +101,7 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
   final List<Course> _courses = [
     Course(
       id: '1',
-      title: 'AI Mastery',
+      title: 'AI Master',
       subtitles: ['Practical AI skills for real income.'],
       icon: Icons.smart_toy,
       courseType: 'Online',
