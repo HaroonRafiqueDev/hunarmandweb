@@ -48,6 +48,38 @@ class GalleryItem {
   });
 }
 
+class DonationOption {
+  final String id;
+  String title;
+  String price;
+  String description;
+  IconData icon;
+  bool isPopular;
+
+  DonationOption({
+    required this.id,
+    required this.title,
+    required this.price,
+    required this.description,
+    required this.icon,
+    this.isPopular = false,
+  });
+}
+
+class BankDetails {
+  String accountName;
+  String accountNo;
+  String bankName;
+  String branchCode;
+
+  BankDetails({
+    required this.accountName,
+    required this.accountNo,
+    required this.bankName,
+    required this.branchCode,
+  });
+}
+
 void main() {
   runApp(const HunarmandKashmirApp());
 }
@@ -181,6 +213,41 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
     ),
   ];
 
+  final List<DonationOption> _donationOptions = [
+    DonationOption(
+      id: '1',
+      title: 'Learning Kit',
+      price: 'Rs. 2,000',
+      description:
+          'Provide a student with essential learning materials, internet access for a month, and software subscriptions.',
+      icon: Icons.card_giftcard,
+    ),
+    DonationOption(
+      id: '2',
+      title: 'Sponsor a Skill',
+      price: 'Rs. 5,000',
+      description:
+          'Cover the cost of a complete short-term module (e.g., Graphic Design Basics) for one deserving student.',
+      icon: Icons.menu_book,
+      isPopular: true,
+    ),
+    DonationOption(
+      id: '3',
+      title: 'Full Scholarship',
+      price: 'Rs. 15,000',
+      description:
+          'Sponsor a student\'s entire journey from beginner to job-ready professional, including mentorship.',
+      icon: Icons.group,
+    ),
+  ];
+
+  final BankDetails _bankDetails = BankDetails(
+    accountName: 'Hunarmand Kashmir Trust',
+    accountNo: '1234 5678 9012',
+    bankName: 'Bank of AJK, Mirpur',
+    branchCode: '0123',
+  );
+
   void _navigateTo(int index) {
     setState(() {
       _currentPageIndex = index;
@@ -305,12 +372,18 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
       case 4:
         return ContactPage(onNavigate: _navigateTo);
       case 5:
-        return DonatePage(onNavigate: _navigateTo);
+        return DonatePage(
+          onNavigate: _navigateTo,
+          donationOptions: _donationOptions,
+          bankDetails: _bankDetails,
+        );
       case 6:
         return AdminPanel(
           onNavigate: _navigateTo,
           courses: _courses,
           galleryItems: _galleryItems,
+          donationOptions: _donationOptions,
+          bankDetails: _bankDetails,
           isLoggedIn: _isAdminLoggedIn,
           onLogin: (success) => setState(() => _isAdminLoggedIn = success),
           onUpdate: () => setState(() {}),
@@ -443,7 +516,14 @@ class ContactPage extends StatelessWidget {
 
 class DonatePage extends StatelessWidget {
   final Function(int) onNavigate;
-  const DonatePage({super.key, required this.onNavigate});
+  final List<DonationOption> donationOptions;
+  final BankDetails bankDetails;
+  const DonatePage({
+    super.key,
+    required this.onNavigate,
+    required this.donationOptions,
+    required this.bankDetails,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -453,8 +533,8 @@ class DonatePage extends StatelessWidget {
           DonateHeroSection(onNavigate: onNavigate),
           const PillarsSection(),
           const TransparencySection(),
-          const WaysToContributeSection(),
-          const BankTransferSection(),
+          WaysToContributeSection(donationOptions: donationOptions),
+          BankTransferSection(bankDetails: bankDetails),
           FooterSection(onNavigate: onNavigate),
         ],
       ),
@@ -637,7 +717,7 @@ class HeroSection extends StatelessWidget {
                 Text(
                   'Rooted in Kashmir. Ready for the World.',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.merriweather(
                     color: Colors.white,
                     fontSize: isMobile ? 28 : 48,
                     fontWeight: FontWeight.bold,
@@ -747,7 +827,7 @@ class WhySection extends StatelessWidget {
           Text(
             'Why Hunarmand Kashmir?',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
               fontSize: isMobile ? 28 : 40,
               fontWeight: FontWeight.bold,
@@ -894,7 +974,7 @@ class ProgramsSection extends StatelessWidget {
               children: [
                 Text(
                   'Skills for the Future',
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.merriweather(
                     color: kPrimaryGreen,
                     fontSize: isMobile ? 28 : 36,
                     fontWeight: FontWeight.bold,
@@ -1073,7 +1153,7 @@ class JourneySection extends StatelessWidget {
           Text(
             'Your Journey Begins Here',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
               fontSize: isMobile ? 32 : 40,
               fontWeight: FontWeight.bold,
@@ -1140,7 +1220,7 @@ class AboutHeroSection extends StatelessWidget {
           Text(
             'Our Story',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: Colors.white,
               fontSize: isMobile ? 40 : 56,
               fontWeight: FontWeight.bold,
@@ -1185,7 +1265,7 @@ class StorySection extends StatelessWidget {
               children: [
                 Text(
                   'From Kashmir to Global Opportunities',
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.merriweather(
                     color: kPrimaryGreen,
                     fontSize: isMobile ? 32 : 40,
                     fontWeight: FontWeight.bold,
@@ -1392,7 +1472,7 @@ class AboutCTASection extends StatelessWidget {
             Text(
               'Be Part of the Change',
               textAlign: TextAlign.center,
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.merriweather(
                 color: Colors.white,
                 fontSize: isMobile ? 28 : 40,
                 fontWeight: FontWeight.bold,
@@ -1447,7 +1527,7 @@ class CoursesHeroSection extends StatelessWidget {
           Text(
             'Start Your Journey',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: Colors.white,
               fontSize: isMobile ? 40 : 56,
               fontWeight: FontWeight.bold,
@@ -1486,7 +1566,7 @@ class LearningChoiceSection extends StatelessWidget {
           Text(
             'Your Learning, Your Choice',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
               fontSize: isMobile ? 28 : 32,
               fontWeight: FontWeight.bold,
@@ -1653,7 +1733,7 @@ class CoursesFeesSection extends StatelessWidget {
           Text(
             'Courses & Fees',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
               fontSize: isMobile ? 28 : 36,
               fontWeight: FontWeight.bold,
@@ -1719,7 +1799,7 @@ class CoursesFeesSection extends StatelessWidget {
                   Expanded(
                     child: Text(
                       course.title,
-                      style: GoogleFonts.playfairDisplay(
+                      style: GoogleFonts.merriweather(
                         color: kPrimaryGreen,
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
@@ -1892,20 +1972,26 @@ class CoursesFeesSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(Icons.calendar_today, color: accentColor, size: 16),
-              const SizedBox(width: 10),
-              Text(
-                batch,
-                style: TextStyle(
-                  color: accentColor,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
+          Expanded(
+            child: Row(
+              children: [
+                Icon(Icons.calendar_today, color: accentColor, size: 16),
+                const SizedBox(width: 10),
+                Flexible(
+                  child: Text(
+                    batch,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: accentColor,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 10),
           Text(
             price,
             style: TextStyle(
@@ -1936,7 +2022,7 @@ class DiscountsSection extends StatelessWidget {
           Text(
             'Early Bird Discounts',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
               fontSize: isMobile ? 28 : 32,
               fontWeight: FontWeight.bold,
@@ -2105,7 +2191,7 @@ class OrphanSupportBanner extends StatelessWidget {
                   Text(
                     'Support for Orphans',
                     textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.merriweather(
                       color: Colors.white,
                       fontSize: isMobile ? 24 : 36,
                       fontWeight: FontWeight.bold,
@@ -2172,7 +2258,7 @@ class ReadyToStartSection extends StatelessWidget {
             Text(
               'Ready to Start?',
               textAlign: TextAlign.center,
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.merriweather(
                 color: Colors.white,
                 fontSize: isMobile ? 32 : 40,
                 fontWeight: FontWeight.bold,
@@ -2258,7 +2344,7 @@ class GalleryHeroSection extends StatelessWidget {
           Text(
             'Moments of Hope',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: Colors.white,
               fontSize: isMobile ? 40 : 56,
               fontWeight: FontWeight.bold,
@@ -2348,7 +2434,7 @@ class ContactHeroSection extends StatelessWidget {
           Text(
             'Get in Touch',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: Colors.white,
               fontSize: isMobile ? 40 : 56,
               fontWeight: FontWeight.bold,
@@ -2393,7 +2479,7 @@ class ContactContentSection extends StatelessWidget {
               children: [
                 Text(
                   'Visit Our Campus',
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.merriweather(
                     color: kPrimaryGreen,
                     fontSize: isMobile ? 28 : 36,
                     fontWeight: FontWeight.bold,
@@ -2478,7 +2564,7 @@ class ContactContentSection extends StatelessWidget {
                   Text(
                     'Quick Response on WhatsApp',
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.merriweather(
                       color: kDarkGreen,
                       fontSize: isMobile ? 24 : 32,
                       fontWeight: FontWeight.bold,
@@ -2624,7 +2710,7 @@ class DonateHeroSection extends StatelessWidget {
           RichText(
             textAlign: TextAlign.center,
             text: TextSpan(
-              style: GoogleFonts.playfairDisplay(
+              style: GoogleFonts.merriweather(
                 color: Colors.white,
                 fontSize: isMobile ? 32 : 56,
                 fontWeight: FontWeight.bold,
@@ -2780,7 +2866,7 @@ class TransparencySection extends StatelessWidget {
               children: [
                 Text(
                   'Our Promise of Transparency',
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.merriweather(
                     color: kPrimaryGreen,
                     fontSize: isMobile ? 28 : 36,
                     fontWeight: FontWeight.bold,
@@ -2917,7 +3003,8 @@ class TransparencySection extends StatelessWidget {
 }
 
 class WaysToContributeSection extends StatelessWidget {
-  const WaysToContributeSection({super.key});
+  final List<DonationOption> donationOptions;
+  const WaysToContributeSection({super.key, required this.donationOptions});
 
   @override
   Widget build(BuildContext context) {
@@ -2934,7 +3021,7 @@ class WaysToContributeSection extends StatelessWidget {
           Text(
             'Ways to Contribute',
             textAlign: TextAlign.center,
-            style: GoogleFonts.playfairDisplay(
+            style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
               fontSize: isMobile ? 28 : 36,
               fontWeight: FontWeight.bold,
@@ -2951,33 +3038,19 @@ class WaysToContributeSection extends StatelessWidget {
             spacing: 30,
             runSpacing: 30,
             alignment: WrapAlignment.center,
-            children: [
-              _priceCard(
-                'Learning Kit',
-                'Rs. 2,000',
-                'Provide a student with essential learning materials, internet access for a month, and software subscriptions.',
-                Icons.card_giftcard,
-                Colors.green,
-                context,
-              ),
-              _priceCard(
-                'Sponsor a Skill',
-                'Rs. 5,000',
-                'Cover the cost of a complete short-term module (e.g., Graphic Design Basics) for one deserving student.',
-                Icons.menu_book,
-                kAccentOrange,
-                context,
-                isPopular: true,
-              ),
-              _priceCard(
-                'Full Scholarship',
-                'Rs. 15,000',
-                'Sponsor a student\'s entire journey from beginner to job-ready professional, including mentorship.',
-                Icons.group,
-                Colors.blueGrey,
-                context,
-              ),
-            ],
+            children: donationOptions
+                .map(
+                  (opt) => _priceCard(
+                    opt.title,
+                    opt.price,
+                    opt.description,
+                    opt.icon,
+                    opt.isPopular ? kAccentOrange : kPrimaryGreen,
+                    context,
+                    isPopular: opt.isPopular,
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -3073,7 +3146,8 @@ class WaysToContributeSection extends StatelessWidget {
 }
 
 class BankTransferSection extends StatelessWidget {
-  const BankTransferSection({super.key});
+  final BankDetails bankDetails;
+  const BankTransferSection({super.key, required this.bankDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -3102,7 +3176,7 @@ class BankTransferSection extends StatelessWidget {
                   Text(
                     'Direct Bank Transfer',
                     textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                    style: GoogleFonts.playfairDisplay(
+                    style: GoogleFonts.merriweather(
                       color: Colors.white,
                       fontSize: isMobile ? 24 : 32,
                       fontWeight: FontWeight.bold,
@@ -3118,10 +3192,14 @@ class BankTransferSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  _bankRow('Account Name:', 'Hunarmand Kashmir Trust', context),
-                  _bankRow('Account No:', '1234 5678 9012', context),
-                  _bankRow('Bank:', 'Bank of AJK, Mirpur', context),
-                  _bankRow('Branch Code:', '0123', context),
+                  _bankRow(
+                    'Account Name:',
+                    bankDetails.accountName,
+                    context,
+                  ),
+                  _bankRow('Account No:', bankDetails.accountNo, context),
+                  _bankRow('Bank:', bankDetails.bankName, context),
+                  _bankRow('Branch Code:', bankDetails.branchCode, context),
                 ],
               ),
             ),
@@ -3232,148 +3310,171 @@ class FooterSection extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Flex(
-            direction: isMobile ? Axis.vertical : Axis.horizontal,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: isMobile ? 0 : 2,
-                child: Column(
-                  crossAxisAlignment: isMobile
-                      ? CrossAxisAlignment.center
-                      : CrossAxisAlignment.start,
-                  children: [
-                    Image.asset(
-                      'assets/images/logo_white.png',
-                      height: 60,
-                      fit: BoxFit.contain,
-                      errorBuilder: (c, e, s) => const Icon(
-                        Icons.school,
-                        size: 50,
-                        color: Colors.white,
-                      ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Wrap(
+                spacing: 60,
+                runSpacing: 40,
+                alignment: WrapAlignment.start,
+                children: [
+                  // Column 1: Brand & About
+                  SizedBox(
+                    width: isMobile ? constraints.maxWidth : constraints.maxWidth * 0.45,
+                    child: Column(
+                      crossAxisAlignment: isMobile
+                          ? CrossAxisAlignment.center
+                          : CrossAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          'assets/images/logo_white.png',
+                          height: 70,
+                          fit: BoxFit.contain,
+                          errorBuilder: (c, e, s) => const Icon(
+                            Icons.school,
+                            size: 60,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 25),
+                        Text(
+                          'Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity right here in the valley.',
+                          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+                          style: GoogleFonts.inter(
+                            color: Colors.white70,
+                            fontSize: 15,
+                            height: 1.8,
+                          ),
+                        ),
+                        const SizedBox(height: 30),
+                        if (!isMobile)
+                          Row(
+                            children: [
+                              _socialIcon(Icons.camera_alt),
+                              const SizedBox(width: 15),
+                              _socialIcon(Icons.facebook),
+                              const SizedBox(width: 15),
+                              _socialIcon(Icons.alternate_email),
+                            ],
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'Empowering Youth. Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity right here in the valley.',
-                      textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                      style: GoogleFonts.inter(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        height: 1.6,
-                      ),
+                  ),
+
+                  // Column 2: Links and Contact
+                  SizedBox(
+                    width: isMobile ? constraints.maxWidth : constraints.maxWidth * 0.45,
+                    child: Wrap(
+                      spacing: 40,
+                      runSpacing: 40,
+                      alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
+                      children: [
+                        // Sub-column: Quick Links
+                        SizedBox(
+                          width: 160,
+                          child: Column(
+                            crossAxisAlignment: isMobile
+                                ? CrossAxisAlignment.center
+                                : CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'QUICK LINKS',
+                                style: TextStyle(
+                                  color: kAccentOrange,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 25),
+                              _footerLink('Our Story', onTap: () => onNavigate(1)),
+                              _footerLink('All Courses', onTap: () => onNavigate(2)),
+                              _footerLink('Gallery', onTap: () => onNavigate(3)),
+                              _footerLink('Contact Us', onTap: () => onNavigate(4)),
+                              _footerLink(
+                                'Donate Now',
+                                isSpecial: true,
+                                onTap: () => onNavigate(5),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Sub-column: Contact Info
+                        SizedBox(
+                          width: 220,
+                          child: Column(
+                            crossAxisAlignment: isMobile
+                                ? CrossAxisAlignment.center
+                                : CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'GET IN TOUCH',
+                                style: TextStyle(
+                                  color: kAccentOrange,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                              const SizedBox(height: 25),
+                              _contactItem(
+                                Icons.location_on_outlined,
+                                'SCO Software Technology Park, Mirpur',
+                              ),
+                              _contactItem(Icons.phone_outlined, '0313 884 0571'),
+                              _contactItem(
+                                Icons.email_outlined,
+                                'salam@hunarmandkashmir.com',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              if (!isMobile) const SizedBox(width: 80),
-              if (isMobile) const SizedBox(height: 40),
-              Expanded(
-                flex: isMobile ? 0 : 2,
-                child: Wrap(
-                  spacing: 40,
-                  runSpacing: 40,
-                  alignment: isMobile
-                      ? WrapAlignment.center
-                      : WrapAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: isMobile ? 150 : null,
-                      child: Column(
-                        crossAxisAlignment: isMobile
-                            ? CrossAxisAlignment.center
-                            : CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Quick Links',
-                            style: TextStyle(
-                              color: kAccentOrange,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          _footerLink('Our Story', onTap: () => onNavigate(1)),
-                          _footerLink(
-                            'All Courses',
-                            onTap: () => onNavigate(2),
-                          ),
-                          _footerLink('Gallery', onTap: () => onNavigate(3)),
-                          _footerLink('Contact Us', onTap: () => onNavigate(4)),
-                          _footerLink(
-                            'Donate',
-                            isSpecial: true,
-                            onTap: () => onNavigate(5),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(
-                      width: isMobile ? 200 : null,
-                      child: Column(
-                        crossAxisAlignment: isMobile
-                            ? CrossAxisAlignment.center
-                            : CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Get in Touch',
-                            style: TextStyle(
-                              color: kAccentOrange,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          _contactItem(
-                            Icons.location_on,
-                            'SCO Software Technology Park, Mirpur',
-                          ),
-                          _contactItem(Icons.phone, '0313 884 0571'),
-                          _contactItem(
-                            Icons.email,
-                            'salam@hunarmandkashmir.com',
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+                  ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 60),
-          const Divider(color: Colors.white12),
-          const SizedBox(height: 20),
+          const Divider(color: Colors.white12, thickness: 1),
+          const SizedBox(height: 30),
           Flex(
             direction: isMobile ? Axis.vertical : Axis.horizontal,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flex(
-                direction: isMobile ? Axis.vertical : Axis.horizontal,
+              Column(
+                crossAxisAlignment: isMobile
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
                 children: [
                   const Text(
                     '© 2026 Hunarmand Kashmir. All rights reserved.',
-                    style: TextStyle(color: Colors.white38, fontSize: 12),
+                    style: TextStyle(color: Colors.white38, fontSize: 13),
                   ),
-                  SizedBox(width: isMobile ? 0 : 20, height: isMobile ? 10 : 0),
+                  const SizedBox(height: 8),
                   InkWell(
                     onTap: () => onNavigate(6),
                     child: const Text(
-                      'Admin',
-                      style: TextStyle(color: Colors.white10, fontSize: 12),
+                      'Admin Dashboard',
+                      style: TextStyle(color: Colors.white10, fontSize: 11),
                     ),
                   ),
                 ],
               ),
-              if (isMobile) const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _socialIcon(Icons.camera_alt),
-                  const SizedBox(width: 20),
-                  _socialIcon(Icons.facebook),
-                  const SizedBox(width: 20),
-                  _socialIcon(Icons.alternate_email),
-                ],
-              ),
+              if (isMobile) ...[
+                const SizedBox(height: 30),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _socialIcon(Icons.camera_alt),
+                    const SizedBox(width: 20),
+                    _socialIcon(Icons.facebook),
+                    const SizedBox(width: 20),
+                    _socialIcon(Icons.alternate_email),
+                  ],
+                ),
+              ],
             ],
           ),
         ],
@@ -3448,6 +3549,8 @@ class AdminPanel extends StatefulWidget {
   final Function(int) onNavigate;
   final List<Course> courses;
   final List<GalleryItem> galleryItems;
+  final List<DonationOption> donationOptions;
+  final BankDetails bankDetails;
   final bool isLoggedIn;
   final Function(bool) onLogin;
   final VoidCallback onUpdate;
@@ -3457,6 +3560,8 @@ class AdminPanel extends StatefulWidget {
     required this.onNavigate,
     required this.courses,
     required this.galleryItems,
+    required this.donationOptions,
+    required this.bankDetails,
     required this.isLoggedIn,
     required this.onLogin,
     required this.onUpdate,
@@ -3468,7 +3573,7 @@ class AdminPanel extends StatefulWidget {
 
 class _AdminPanelState extends State<AdminPanel> {
   final TextEditingController _passController = TextEditingController();
-  int _activeTab = 0; // 0: Courses, 1: Gallery
+  int _activeTab = 0; // 0: Courses, 1: Gallery, 2: Donations, 3: Bank Details
 
   void _login() {
     if (_passController.text == 'admin123') {
@@ -3502,7 +3607,7 @@ class _AdminPanelState extends State<AdminPanel> {
                 const SizedBox(height: 20),
                 Text(
                   'Admin Login',
-                  style: GoogleFonts.playfairDisplay(
+                  style: GoogleFonts.merriweather(
                     fontSize: isMobile ? 20 : 24,
                     fontWeight: FontWeight.bold,
                   ),
@@ -3568,7 +3673,13 @@ class _AdminPanelState extends State<AdminPanel> {
             Container(width: 250, color: kLightBg, child: _sidebarContent()),
           // Content
           Expanded(
-            child: _activeTab == 0 ? _manageCourses() : _manageGallery(),
+            child: _activeTab == 0
+                ? _manageCourses()
+                : _activeTab == 1
+                    ? _manageGallery()
+                    : _activeTab == 2
+                        ? _manageDonations()
+                        : _manageBank(),
           ),
         ],
       ),
@@ -3581,6 +3692,8 @@ class _AdminPanelState extends State<AdminPanel> {
         const SizedBox(height: 20),
         _sidebarItem(0, Icons.book, 'Manage Courses'),
         _sidebarItem(1, Icons.image, 'Manage Gallery'),
+        _sidebarItem(2, Icons.favorite, 'Manage Donations'),
+        _sidebarItem(3, Icons.account_balance, 'Bank Details'),
         const Spacer(),
         ListTile(
           leading: const Icon(Icons.arrow_back),
@@ -4255,6 +4368,288 @@ class _AdminPanelState extends State<AdminPanel> {
             child: const Text('Add'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _manageDonations() {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Donation Options',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              ElevatedButton.icon(
+                onPressed: _addDonationDialog,
+                icon: const Icon(Icons.add),
+                label: const Text('Add Option'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kAccentOrange,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(20),
+            itemCount: widget.donationOptions.length,
+            itemBuilder: (context, index) {
+              final opt = widget.donationOptions[index];
+              return Card(
+                child: ListTile(
+                  leading: Icon(opt.icon, color: kAccentOrange),
+                  title: Text(opt.title,
+                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(opt.price),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (opt.isPopular)
+                        const Chip(
+                          label:
+                              Text('Popular', style: TextStyle(fontSize: 10)),
+                          backgroundColor: Colors.amberAccent,
+                        ),
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.orange),
+                        onPressed: () => _editDonationDialog(opt),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () {
+                          setState(() => widget.donationOptions.removeAt(index));
+                          widget.onUpdate();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _manageBank() {
+    final nameController =
+        TextEditingController(text: widget.bankDetails.accountName);
+    final noController =
+        TextEditingController(text: widget.bankDetails.accountNo);
+    final bankController =
+        TextEditingController(text: widget.bankDetails.bankName);
+    final branchController =
+        TextEditingController(text: widget.bankDetails.branchCode);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(40),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Bank Transfer Details',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'This information is displayed in the "Direct Bank Transfer" section of the Donate page.',
+            style: TextStyle(color: Colors.grey),
+          ),
+          const SizedBox(height: 40),
+          TextField(
+            controller: nameController,
+            decoration: const InputDecoration(
+              labelText: 'Account Name',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.person_outline),
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: noController,
+            decoration: const InputDecoration(
+              labelText: 'Account Number',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.numbers),
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: bankController,
+            decoration: const InputDecoration(
+              labelText: 'Bank Name',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.account_balance_outlined),
+            ),
+          ),
+          const SizedBox(height: 20),
+          TextField(
+            controller: branchController,
+            decoration: const InputDecoration(
+              labelText: 'Branch Code',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.code),
+            ),
+          ),
+          const SizedBox(height: 40),
+          ElevatedButton(
+            onPressed: () {
+              setState(() {
+                widget.bankDetails.accountName = nameController.text;
+                widget.bankDetails.accountNo = noController.text;
+                widget.bankDetails.bankName = bankController.text;
+                widget.bankDetails.branchCode = branchController.text;
+              });
+              widget.onUpdate();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                    content: Text('Bank details updated successfully!')),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: kPrimaryGreen,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(double.infinity, 60),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text('Update Bank Information',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addDonationDialog() {
+    final titleController = TextEditingController();
+    final priceController = TextEditingController();
+    final descController = TextEditingController();
+    bool tempPopular = false;
+    IconData tempIcon = Icons.card_giftcard;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Add Donation Option'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(labelText: 'Title'),
+                ),
+                TextField(
+                  controller: priceController,
+                  decoration:
+                      const InputDecoration(labelText: 'Price (e.g. Rs. 2,000)'),
+                ),
+                TextField(
+                  controller: descController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                ),
+                SwitchListTile(
+                  title: const Text('Most Popular?'),
+                  value: tempPopular,
+                  onChanged: (v) => setDialogState(() => tempPopular = v),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  widget.donationOptions.add(DonationOption(
+                    id: DateTime.now().toString(),
+                    title: titleController.text,
+                    price: priceController.text,
+                    description: descController.text,
+                    icon: tempIcon,
+                    isPopular: tempPopular,
+                  ));
+                });
+                widget.onUpdate();
+                Navigator.pop(context);
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _editDonationDialog(DonationOption opt) {
+    final titleController = TextEditingController(text: opt.title);
+    final priceController = TextEditingController(text: opt.price);
+    final descController = TextEditingController(text: opt.description);
+    bool tempPopular = opt.isPopular;
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Edit Donation Option'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(labelText: 'Title'),
+                ),
+                TextField(
+                  controller: priceController,
+                  decoration: const InputDecoration(labelText: 'Price'),
+                ),
+                TextField(
+                  controller: descController,
+                  maxLines: 3,
+                  decoration: const InputDecoration(labelText: 'Description'),
+                ),
+                SwitchListTile(
+                  title: const Text('Most Popular?'),
+                  value: tempPopular,
+                  onChanged: (v) => setDialogState(() => tempPopular = v),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  opt.title = titleController.text;
+                  opt.price = priceController.text;
+                  opt.description = descController.text;
+                  opt.isPopular = tempPopular;
+                });
+                widget.onUpdate();
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        ),
       ),
     );
   }
