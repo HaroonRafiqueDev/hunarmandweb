@@ -953,11 +953,12 @@ class ProgramsSection extends StatelessWidget {
         horizontal: isMobile ? 20 : 80,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (showHeader) ...[
-            const Text(
+            Text(
               'OUR PROGRAMS',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: kAccentOrange,
                 fontWeight: FontWeight.bold,
@@ -967,19 +968,21 @@ class ProgramsSection extends StatelessWidget {
             const SizedBox(height: 10),
             Flex(
               direction: isMobile ? Axis.vertical : Axis.horizontal,
-              crossAxisAlignment: isMobile
-                  ? CrossAxisAlignment.start
-                  : CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: isMobile
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'Skills for the Future',
+                  textAlign: isMobile ? TextAlign.center : TextAlign.start,
                   style: GoogleFonts.merriweather(
                     color: kPrimaryGreen,
                     fontSize: isMobile ? 28 : 36,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                if (isMobile) const SizedBox(height: 10),
                 TextButton(
                   onPressed: () => onNavigate(2),
                   child: const Text(
@@ -994,12 +997,16 @@ class ProgramsSection extends StatelessWidget {
             ),
             const SizedBox(height: 40),
           ],
-          Wrap(
-            spacing: 20,
-            runSpacing: 20,
-            children: visibleCourses
-                .map((course) => _buildCourseCard(course, context))
-                .toList(),
+          Center(
+            child: Wrap(
+              spacing: 30,
+              runSpacing: 30,
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              children: visibleCourses
+                  .map((course) => _buildCourseCard(course, context))
+                  .toList(),
+            ),
           ),
         ],
       ),
@@ -1326,26 +1333,26 @@ class StorySection extends StatelessWidget {
             flex: isMobile ? 0 : 4,
             child: Column(
               children: [
-                Container(
-                  width: double.infinity,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: const LinearGradient(
-                      colors: [kAccentOrange, Color(0xFFFF7A00)],
-                    ),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Our Story',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                // Container(
+                //   width: double.infinity,
+                //   height: 20,
+                //   decoration: BoxDecoration(
+                //     borderRadius: BorderRadius.circular(10),
+                //     gradient: const LinearGradient(
+                //       colors: [kAccentOrange, Color(0xFFFF7A00)],
+                //     ),
+                //   ),
+                //   child: const Center(
+                //     child: Text(
+                //       'Our Story',
+                //       style: TextStyle(
+                //         color: Colors.white,
+                //         fontSize: 10,
+                //         fontWeight: FontWeight.bold,
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 40),
                 Image.network(
                   'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
@@ -2102,30 +2109,75 @@ class DiscountsSection extends StatelessWidget {
   ) {
     bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 220,
-      padding: const EdgeInsets.symmetric(vertical: 40),
+      width: isMobile ? double.infinity : 240,
+      padding: const EdgeInsets.symmetric(vertical: 45, horizontal: 20),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 40,
+            spreadRadius: 1,
+            offset: const Offset(0, 15),
+          ),
+        ],
       ),
-      child: Column(
+      child: Stack(
+        clipBehavior: Clip.none,
         children: [
-          Text(
-            group,
-            style: TextStyle(
-              color: accentColor.withValues(alpha: 0.8),
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+          Positioned(
+            top: -45,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Container(
+                width: 60,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: accentColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 10),
-          Text(
-            discount,
-            style: TextStyle(
-              color: accentColor,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: bgColor.withValues(alpha: 0.3),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.local_offer_rounded,
+                  color: accentColor,
+                  size: 30,
+                ),
+              ),
+              const SizedBox(height: 25),
+              Text(
+                group,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.black54,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                discount,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.inter(
+                  color: accentColor,
+                  fontSize: 32,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -2135,21 +2187,39 @@ class DiscountsSection extends StatelessWidget {
   Widget _noteBox(IconData icon, String text, BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 400,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      width: isMobile ? double.infinity : 420,
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
       decoration: BoxDecoration(
-        color: Colors.orange.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.orange.withValues(alpha: 0.2)),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.orange.withValues(alpha: 0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.orange.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.orange, size: 18),
-          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.orange.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: Colors.orange, size: 20),
+          ),
+          const SizedBox(width: 15),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(fontSize: 13, color: Colors.orange),
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.black87,
+                height: 1.4,
+              ),
             ),
           ),
         ],
@@ -3192,11 +3262,7 @@ class BankTransferSection extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 40),
-                  _bankRow(
-                    'Account Name:',
-                    bankDetails.accountName,
-                    context,
-                  ),
+                  _bankRow('Account Name:', bankDetails.accountName, context),
                   _bankRow('Account No:', bankDetails.accountNo, context),
                   _bankRow('Bank:', bankDetails.bankName, context),
                   _bankRow('Branch Code:', bankDetails.branchCode, context),
@@ -3319,7 +3385,9 @@ class FooterSection extends StatelessWidget {
                 children: [
                   // Column 1: Brand & About
                   SizedBox(
-                    width: isMobile ? constraints.maxWidth : constraints.maxWidth * 0.45,
+                    width: isMobile
+                        ? constraints.maxWidth
+                        : constraints.maxWidth * 0.45,
                     child: Column(
                       crossAxisAlignment: isMobile
                           ? CrossAxisAlignment.center
@@ -3338,7 +3406,9 @@ class FooterSection extends StatelessWidget {
                         const SizedBox(height: 25),
                         Text(
                           'Empowering the youth of Kashmir through digital skills, fostering self-reliance, and building a future where talent meets opportunity right here in the valley.',
-                          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+                          textAlign: isMobile
+                              ? TextAlign.center
+                              : TextAlign.start,
                           style: GoogleFonts.inter(
                             color: Colors.white70,
                             fontSize: 15,
@@ -3362,11 +3432,15 @@ class FooterSection extends StatelessWidget {
 
                   // Column 2: Links and Contact
                   SizedBox(
-                    width: isMobile ? constraints.maxWidth : constraints.maxWidth * 0.45,
+                    width: isMobile
+                        ? constraints.maxWidth
+                        : constraints.maxWidth * 0.45,
                     child: Wrap(
                       spacing: 40,
                       runSpacing: 40,
-                      alignment: isMobile ? WrapAlignment.center : WrapAlignment.start,
+                      alignment: isMobile
+                          ? WrapAlignment.center
+                          : WrapAlignment.start,
                       children: [
                         // Sub-column: Quick Links
                         SizedBox(
@@ -3386,10 +3460,22 @@ class FooterSection extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(height: 25),
-                              _footerLink('Our Story', onTap: () => onNavigate(1)),
-                              _footerLink('All Courses', onTap: () => onNavigate(2)),
-                              _footerLink('Gallery', onTap: () => onNavigate(3)),
-                              _footerLink('Contact Us', onTap: () => onNavigate(4)),
+                              _footerLink(
+                                'Our Story',
+                                onTap: () => onNavigate(1),
+                              ),
+                              _footerLink(
+                                'All Courses',
+                                onTap: () => onNavigate(2),
+                              ),
+                              _footerLink(
+                                'Gallery',
+                                onTap: () => onNavigate(3),
+                              ),
+                              _footerLink(
+                                'Contact Us',
+                                onTap: () => onNavigate(4),
+                              ),
                               _footerLink(
                                 'Donate Now',
                                 isSpecial: true,
@@ -3421,7 +3507,10 @@ class FooterSection extends StatelessWidget {
                                 Icons.location_on_outlined,
                                 'SCO Software Technology Park, Mirpur',
                               ),
-                              _contactItem(Icons.phone_outlined, '0313 884 0571'),
+                              _contactItem(
+                                Icons.phone_outlined,
+                                '0313 884 0571',
+                              ),
                               _contactItem(
                                 Icons.email_outlined,
                                 'salam@hunarmandkashmir.com',
@@ -3676,10 +3765,10 @@ class _AdminPanelState extends State<AdminPanel> {
             child: _activeTab == 0
                 ? _manageCourses()
                 : _activeTab == 1
-                    ? _manageGallery()
-                    : _activeTab == 2
-                        ? _manageDonations()
-                        : _manageBank(),
+                ? _manageGallery()
+                : _activeTab == 2
+                ? _manageDonations()
+                : _manageBank(),
           ),
         ],
       ),
@@ -4405,16 +4494,20 @@ class _AdminPanelState extends State<AdminPanel> {
               return Card(
                 child: ListTile(
                   leading: Icon(opt.icon, color: kAccentOrange),
-                  title: Text(opt.title,
-                      style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(
+                    opt.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   subtitle: Text(opt.price),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (opt.isPopular)
                         const Chip(
-                          label:
-                              Text('Popular', style: TextStyle(fontSize: 10)),
+                          label: Text(
+                            'Popular',
+                            style: TextStyle(fontSize: 10),
+                          ),
                           backgroundColor: Colors.amberAccent,
                         ),
                       IconButton(
@@ -4424,7 +4517,9 @@ class _AdminPanelState extends State<AdminPanel> {
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () {
-                          setState(() => widget.donationOptions.removeAt(index));
+                          setState(
+                            () => widget.donationOptions.removeAt(index),
+                          );
                           widget.onUpdate();
                         },
                       ),
@@ -4440,14 +4535,18 @@ class _AdminPanelState extends State<AdminPanel> {
   }
 
   Widget _manageBank() {
-    final nameController =
-        TextEditingController(text: widget.bankDetails.accountName);
-    final noController =
-        TextEditingController(text: widget.bankDetails.accountNo);
-    final bankController =
-        TextEditingController(text: widget.bankDetails.bankName);
-    final branchController =
-        TextEditingController(text: widget.bankDetails.branchCode);
+    final nameController = TextEditingController(
+      text: widget.bankDetails.accountName,
+    );
+    final noController = TextEditingController(
+      text: widget.bankDetails.accountNo,
+    );
+    final bankController = TextEditingController(
+      text: widget.bankDetails.bankName,
+    );
+    final branchController = TextEditingController(
+      text: widget.bankDetails.branchCode,
+    );
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(40),
@@ -4511,7 +4610,8 @@ class _AdminPanelState extends State<AdminPanel> {
               widget.onUpdate();
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                    content: Text('Bank details updated successfully!')),
+                  content: Text('Bank details updated successfully!'),
+                ),
               );
             },
             style: ElevatedButton.styleFrom(
@@ -4522,8 +4622,10 @@ class _AdminPanelState extends State<AdminPanel> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('Update Bank Information',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            child: const Text(
+              'Update Bank Information',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
@@ -4552,8 +4654,9 @@ class _AdminPanelState extends State<AdminPanel> {
                 ),
                 TextField(
                   controller: priceController,
-                  decoration:
-                      const InputDecoration(labelText: 'Price (e.g. Rs. 2,000)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Price (e.g. Rs. 2,000)',
+                  ),
                 ),
                 TextField(
                   controller: descController,
@@ -4570,19 +4673,22 @@ class _AdminPanelState extends State<AdminPanel> {
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel')),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  widget.donationOptions.add(DonationOption(
-                    id: DateTime.now().toString(),
-                    title: titleController.text,
-                    price: priceController.text,
-                    description: descController.text,
-                    icon: tempIcon,
-                    isPopular: tempPopular,
-                  ));
+                  widget.donationOptions.add(
+                    DonationOption(
+                      id: DateTime.now().toString(),
+                      title: titleController.text,
+                      price: priceController.text,
+                      description: descController.text,
+                      icon: tempIcon,
+                      isPopular: tempPopular,
+                    ),
+                  );
                 });
                 widget.onUpdate();
                 Navigator.pop(context);
@@ -4633,8 +4739,9 @@ class _AdminPanelState extends State<AdminPanel> {
           ),
           actions: [
             TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel')),
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
             ElevatedButton(
               onPressed: () {
                 setState(() {
