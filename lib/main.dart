@@ -462,8 +462,8 @@ class CoursesPage extends StatelessWidget {
       child: Column(
         children: [
           CoursesHeroSection(onNavigate: onNavigate),
-          CoursesFeesSection(courses: courses), // Dynamic grid moved into here
           const DiscountsSection(),
+          CoursesFeesSection(courses: courses), // Dynamic grid moved into here
           const OrphanSupportBanner(),
           ReadyToStartSection(onNavigate: onNavigate),
           FooterSection(onNavigate: onNavigate),
@@ -719,7 +719,7 @@ class HeroSection extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: GoogleFonts.merriweather(
                     color: Colors.white,
-                    fontSize: isMobile ? 28 : 48,
+                    fontSize: isMobile ? 32 : 44,
                     fontWeight: FontWeight.bold,
                     height: 1.2,
                   ),
@@ -829,7 +829,7 @@ class WhySection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
-              fontSize: isMobile ? 28 : 40,
+              fontSize: isMobile ? 32 : 48,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -841,7 +841,7 @@ class WhySection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: Colors.black54,
-              fontSize: isMobile ? 14 : 16,
+              fontSize: isMobile ? 16 : 20,
               height: 1.5,
             ),
           ),
@@ -978,7 +978,7 @@ class ProgramsSection extends StatelessWidget {
                   textAlign: isMobile ? TextAlign.center : TextAlign.start,
                   style: GoogleFonts.merriweather(
                     color: kPrimaryGreen,
-                    fontSize: isMobile ? 28 : 36,
+                    fontSize: isMobile ? 32 : 44,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1152,8 +1152,8 @@ class JourneySection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: isMobile ? 60 : 100,
-        horizontal: isMobile ? 20 : 40,
+        vertical: isMobile ? 60 : 120,
+        horizontal: isMobile ? 24 : 40,
       ),
       child: Column(
         children: [
@@ -1162,7 +1162,7 @@ class JourneySection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
-              fontSize: isMobile ? 32 : 40,
+              fontSize: isMobile ? 36 : 48,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1172,7 +1172,7 @@ class JourneySection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: Colors.black54,
-              fontSize: isMobile ? 14 : 16,
+              fontSize: isMobile ? 16 : 20,
               height: 1.5,
             ),
           ),
@@ -1194,7 +1194,7 @@ class JourneySection extends StatelessWidget {
               'Apply Now',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: isMobile ? 16 : 18,
+                fontSize: isMobile ? 18 : 22,
               ),
             ),
           ),
@@ -1229,7 +1229,7 @@ class AboutHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.merriweather(
               color: Colors.white,
-              fontSize: isMobile ? 40 : 56,
+              fontSize: isMobile ? 48 : 72,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1239,7 +1239,7 @@ class AboutHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: Colors.white.withValues(alpha: 0.9),
-              fontSize: isMobile ? 14 : 18,
+              fontSize: isMobile ? 18 : 22,
               height: 1.5,
             ),
           ),
@@ -1256,6 +1256,77 @@ class StorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'From Kashmir to Global Opportunities',
+          style: GoogleFonts.merriweather(
+            color: kPrimaryGreen,
+            fontSize: isMobile ? 36 : 48,
+            fontWeight: FontWeight.bold,
+            height: 1.1,
+          ),
+        ),
+        const SizedBox(height: 40),
+        Text(
+          'Hunarmand Kashmir was born from a simple yet powerful truth: talent is everywhere, but opportunity is not. For far too long, the brilliant minds of Kashmir have faced challenges—geographical isolation, limited infrastructure, and limited exposure to global industries.',
+          style: GoogleFonts.inter(
+            color: Colors.black87,
+            fontSize: isMobile ? 16 : 20,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 30),
+        const Text(
+          'We chose to change that.',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: kPrimaryGreen,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 30),
+        Text(
+          'We believe digital skills are the great equalizer. With the right training, mentorship, and access, a student from even the most remote areas of Kashmir can work with companies and clients across the world.',
+          style: GoogleFonts.inter(
+            color: Colors.black87,
+            fontSize: isMobile ? 16 : 20,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 40),
+        Container(
+          padding: const EdgeInsets.all(30),
+          decoration: const BoxDecoration(
+            border: Border(left: BorderSide(color: kAccentOrange, width: 4)),
+          ),
+          child: Text(
+            '"At Hunarmand Kashmir, we don’t just teach skills—we open doors, restore confidence, and help build futures rooted in dignity, independence, and global opportunity."',
+            style: GoogleFonts.inter(
+              fontStyle: FontStyle.italic,
+              color: Colors.black54,
+              fontSize: isMobile ? 16 : 20,
+              height: 1.6,
+            ),
+          ),
+        ),
+      ],
+    );
+
+    final image = Column(
+      children: [
+        const SizedBox(height: 40),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Image.network(
+            'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
+            fit: BoxFit.cover,
+          ),
+        ),
+      ],
+    );
+
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 60 : 100,
@@ -1265,102 +1336,10 @@ class StorySection extends StatelessWidget {
         direction: isMobile ? Axis.vertical : Axis.horizontal,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: isMobile ? 0 : 6,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'From Kashmir to Global Opportunities',
-                  style: GoogleFonts.merriweather(
-                    color: kPrimaryGreen,
-                    fontSize: isMobile ? 32 : 40,
-                    fontWeight: FontWeight.bold,
-                    height: 1.1,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Text(
-                  'Hunarmand Kashmir was born from a simple yet powerful truth: talent is everywhere, but opportunity is not. For far too long, the brilliant minds of Kashmir have faced challenges—geographical isolation, limited infrastructure, and limited exposure to global industries.',
-                  style: GoogleFonts.inter(
-                    color: Colors.black87,
-                    fontSize: isMobile ? 14 : 16,
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                const Text(
-                  'We chose to change that.',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: kPrimaryGreen,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Text(
-                  'We believe digital skills are the great equalizer. With the right training, mentorship, and access, a student from even the most remote areas of Kashmir can work with companies and clients across the world.',
-                  style: GoogleFonts.inter(
-                    color: Colors.black87,
-                    fontSize: isMobile ? 14 : 16,
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Container(
-                  padding: const EdgeInsets.all(30),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      left: BorderSide(color: kAccentOrange, width: 4),
-                    ),
-                  ),
-                  child: Text(
-                    '"At Hunarmand Kashmir, we don’t just teach skills—we open doors, restore confidence, and help build futures rooted in dignity, independence, and global opportunity."',
-                    style: GoogleFonts.inter(
-                      fontStyle: FontStyle.italic,
-                      color: Colors.black54,
-                      fontSize: isMobile ? 14 : 16,
-                      height: 1.6,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          isMobile ? content : Expanded(flex: 6, child: content),
           if (!isMobile) const SizedBox(width: 80),
           if (isMobile) const SizedBox(height: 40),
-          Expanded(
-            flex: isMobile ? 0 : 4,
-            child: Column(
-              children: [
-                // Container(
-                //   width: double.infinity,
-                //   height: 20,
-                //   decoration: BoxDecoration(
-                //     borderRadius: BorderRadius.circular(10),
-                //     gradient: const LinearGradient(
-                //       colors: [kAccentOrange, Color(0xFFFF7A00)],
-                //     ),
-                //   ),
-                //   child: const Center(
-                //     child: Text(
-                //       'Our Story',
-                //       style: TextStyle(
-                //         color: Colors.white,
-                //         fontSize: 10,
-                //         fontWeight: FontWeight.bold,
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                const SizedBox(height: 40),
-                Image.network(
-                  'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80',
-                  fit: BoxFit.cover,
-                ),
-              ],
-            ),
-          ),
+          isMobile ? image : Expanded(flex: 4, child: image),
         ],
       ),
     );
@@ -1461,8 +1440,8 @@ class AboutCTASection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 80,
-        vertical: isMobile ? 60 : 100,
+        horizontal: isMobile ? 24 : 40,
+        vertical: isMobile ? 80 : 140,
       ),
       child: Container(
         width: double.infinity,
@@ -1481,7 +1460,7 @@ class AboutCTASection extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.merriweather(
                 color: Colors.white,
-                fontSize: isMobile ? 28 : 40,
+                fontSize: isMobile ? 32 : 48,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -1536,7 +1515,7 @@ class CoursesHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.merriweather(
               color: Colors.white,
-              fontSize: isMobile ? 40 : 56,
+              fontSize: isMobile ? 48 : 72,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1546,7 +1525,7 @@ class CoursesHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: Colors.white.withValues(alpha: 0.9),
-              fontSize: isMobile ? 14 : 18,
+              fontSize: isMobile ? 18 : 22,
               height: 1.5,
             ),
           ),
@@ -1742,7 +1721,7 @@ class CoursesFeesSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
-              fontSize: isMobile ? 28 : 36,
+              fontSize: isMobile ? 32 : 44,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -1979,7 +1958,9 @@ class CoursesFeesSection extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(
+          Flexible(
+            flex: 4,
+            fit: FlexFit.loose,
             child: Row(
               children: [
                 Icon(Icons.calendar_today, color: accentColor, size: 16),
@@ -2021,81 +2002,114 @@ class DiscountsSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: isMobile ? 60 : 100,
-        horizontal: isMobile ? 20 : 80,
+        vertical: isMobile ? 80 : 140,
+        horizontal: isMobile ? 24 : 40,
       ),
-      child: Column(
-        children: [
-          Text(
-            'Early Bird Discounts',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.merriweather(
-              color: kPrimaryGreen,
-              fontSize: isMobile ? 28 : 32,
-              fontWeight: FontWeight.bold,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(isMobile ? 30 : 60),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 40,
+              offset: const Offset(0, 10),
             ),
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            'Limited seats available — First come, first served.',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.black54),
-          ),
-          const SizedBox(height: 50),
-          Wrap(
-            spacing: 20,
-            runSpacing: 20,
-            alignment: WrapAlignment.center,
-            children: [
-              _buildDiscountCard(
-                'First 10 Students',
-                '15% OFF',
-                const Color(0xFFE0F7FA),
-                const Color(0xFF00ACC1),
-                context,
+          ],
+        ),
+        child: Column(
+          children: [
+            Text(
+              'Early Bird Discounts',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.merriweather(
+                color: kDarkGreen,
+                fontSize: isMobile ? 32 : 44,
+                fontWeight: FontWeight.bold,
               ),
-              _buildDiscountCard(
-                'Next 10 Students',
-                '10% OFF',
-                const Color(0xFFE8F5E9),
-                const Color(0xFF43A047),
-                context,
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Limited seats available — total seats are only 20. Discounts are applied from highest to\nlowest on a first-come, first-served basis.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: isMobile ? 16 : 20,
+                height: 1.5,
               ),
-              _buildDiscountCard(
-                'Next 10 Students',
-                '5% OFF',
-                const Color(0xFFE1F5FE),
-                const Color(0xFF039BE5),
-                context,
-              ),
-              _buildDiscountCard(
-                'Remaining Seats',
-                'Full Fee',
-                const Color(0xFFF5F5F5),
-                Colors.grey,
-                context,
-              ),
-            ],
-          ),
-          const SizedBox(height: 60),
-          Wrap(
-            spacing: 20,
-            runSpacing: 15,
-            alignment: WrapAlignment.center,
-            children: [
-              _noteBox(
-                Icons.info_outline,
-                'Only one discount can be applied per student.',
-                context,
-              ),
-              _noteBox(
-                Icons.payments_outlined,
-                '50% Advance Fee required to confirm your seat booking.',
-                context,
-              ),
-            ],
-          ),
-        ],
+            ),
+            const SizedBox(height: 60),
+            Wrap(
+              spacing: 30,
+              runSpacing: 30,
+              alignment: WrapAlignment.center,
+              children: [
+                _buildDiscountCard(
+                  'FIRST 5 STUDENTS',
+                  '15% OFF',
+                  const Color(0xFFD1FADF), // Light Green
+                  const Color(0xFF027A48), // Dark Green text
+                  context,
+                ),
+                _buildDiscountCard(
+                  'NEXT 5 STUDENTS',
+                  '10% OFF',
+                  const Color(0xFFCCFBFF), // Light Cyan
+                  const Color(0xFF006D77), // Dark Cyan text
+                  context,
+                ),
+                _buildDiscountCard(
+                  'NEXT 5 STUDENTS',
+                  '5% OFF',
+                  const Color(0xFFD1E9FF), // Light Blue
+                  const Color(0xFF175CD3), // Dark Blue text
+                  context,
+                ),
+                _buildDiscountCard(
+                  'REMAINING SEATS',
+                  'Full Fee',
+                  const Color(0xFFF2F4F7), // Light Grey
+                  const Color(0xFF344054), // Dark Grey text
+                  context,
+                ),
+              ],
+            ),
+            const SizedBox(height: 80),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.error_outline, color: kAccentOrange, size: 32),
+                const SizedBox(width: 15),
+                Text(
+                  'Important Notes',
+                  style: GoogleFonts.merriweather(
+                    fontSize: isMobile ? 24 : 32,
+                    fontWeight: FontWeight.bold,
+                    color: kDarkGreen,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 40),
+            Wrap(
+              spacing: 30,
+              runSpacing: 20,
+              alignment: WrapAlignment.center,
+              children: [
+                _noteBox(
+                  'Only one discount applies per student.',
+                  context,
+                ),
+                _noteBox(
+                  '30% Advance Fee is required to confirm your booking.',
+                  context,
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -2104,119 +2118,69 @@ class DiscountsSection extends StatelessWidget {
     String group,
     String discount,
     Color bgColor,
-    Color accentColor,
+    Color textColor,
     BuildContext context,
   ) {
     bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 240,
-      padding: const EdgeInsets.symmetric(vertical: 45, horizontal: 20),
+      width: isMobile ? double.infinity : 280,
+      padding: const EdgeInsets.symmetric(vertical: 60, horizontal: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(25),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 40,
-            spreadRadius: 1,
-            offset: const Offset(0, 15),
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      child: Stack(
-        clipBehavior: Clip.none,
+      child: Column(
         children: [
-          Positioned(
-            top: -45,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Container(
-                width: 60,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: accentColor,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+          Text(
+            group,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: textColor.withValues(alpha: 0.6),
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1,
             ),
           ),
-          Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: bgColor.withValues(alpha: 0.3),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.local_offer_rounded,
-                  color: accentColor,
-                  size: 30,
-                ),
-              ),
-              const SizedBox(height: 25),
-              Text(
-                group,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                discount,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: accentColor,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: -1,
-                ),
-              ),
-            ],
+          const SizedBox(height: 20),
+          Text(
+            discount,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: textColor.withValues(alpha: 0.8),
+              fontSize: 44,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _noteBox(IconData icon, String text, BuildContext context) {
+  Widget _noteBox(String text, BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 420,
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
+      width: isMobile ? double.infinity : 550,
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.orange.withValues(alpha: 0.1)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withValues(alpha: 0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
+        color: const Color(0xFFFEFBE8), // Light Yellow
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.orange.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, color: Colors.orange, size: 20),
-          ),
-          const SizedBox(width: 15),
+          Icon(Icons.check_circle_outline, color: kAccentOrange, size: 24),
+          const SizedBox(width: 20),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                fontSize: 14,
+              style: TextStyle(
+                fontSize: isMobile ? 16 : 20,
                 color: Colors.black87,
                 height: 1.4,
               ),
@@ -2235,68 +2199,118 @@ class OrphanSupportBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 80),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 24 : 220,
+        vertical: 40,
+      ),
       child: Container(
-        padding: EdgeInsets.all(isMobile ? 30 : 60),
+        width: double.infinity,
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: kPrimaryGreen,
-          borderRadius: BorderRadius.circular(30),
-        ),
-        child: Flex(
-          direction: isMobile ? Axis.vertical : Axis.horizontal,
-          children: [
-            Icon(
-              Icons.favorite,
-              color: Colors.orange,
-              size: isMobile ? 40 : 60,
+          color: kDarkGreen,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 25,
+              offset: const Offset(0, 10),
             ),
-            SizedBox(width: isMobile ? 0 : 40, height: isMobile ? 20 : 0),
-            Expanded(
-              flex: isMobile ? 0 : 1,
-              child: Column(
-                crossAxisAlignment: isMobile
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.start,
+          ],
+        ),
+        child: Stack(
+          children: [
+            // Watermark Icon
+            Positioned(
+              right: -30,
+              bottom: -30,
+              child: Opacity(
+                opacity: 0.08,
+                child: Icon(
+                  Icons.favorite_border,
+                  size: isMobile ? 140 : 220,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 24 : 40,
+                vertical: isMobile ? 60 : 100, // Further increased height
+              ),
+              child: Row(
                 children: [
-                  Text(
-                    'Support for Orphans',
-                    textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                    style: GoogleFonts.merriweather(
-                      color: Colors.white,
-                      fontSize: isMobile ? 24 : 36,
-                      fontWeight: FontWeight.bold,
+                  // Icon Circle
+                  Container(
+                    width: isMobile ? 60 : 90,
+                    height: isMobile ? 60 : 90,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.05),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.favorite,
+                        color: kAccentOrange,
+                        size: isMobile ? 30 : 45,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text.rich(
-                    textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                    TextSpan(
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: isMobile ? 14 : 18,
-                      ),
-                      children: [
-                        const TextSpan(text: 'We provide a '),
-                        TextSpan(
-                          text: '100% Fee Waiver',
-                          style: TextStyle(
-                            color: kAccentOrange,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  const SizedBox(width: 32),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Support for Orphans',
+                        style: GoogleFonts.merriweather(
+                          color: Colors.white,
+                          fontSize: isMobile ? 28 : 36,
+                          fontWeight: FontWeight.bold,
                         ),
-                        const TextSpan(text: ' for orphan students.'),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(height: 12),
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            'We provide a ',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: isMobile ? 16 : 20,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: kAccentOrange,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '100% Fee Waiver',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: isMobile ? 18 : 22,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            ' for orphan students.',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: isMobile ? 18 : 22,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            if (!isMobile)
-              const Icon(
-                Icons.favorite_border,
-                color: Colors.white12,
-                size: 120,
-              ),
           ],
         ),
       ),
@@ -2312,16 +2326,26 @@ class ReadyToStartSection extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
-      padding: EdgeInsets.all(isMobile ? 20 : 80),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 24 : 220,
+        vertical: 40,
+      ),
       child: Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(
-          vertical: isMobile ? 40 : 80,
-          horizontal: isMobile ? 20 : 40,
+          vertical: isMobile ? 60 : 100, // Matched with OrphanSupportBanner
+          horizontal: isMobile ? 24 : 40,
         ),
         decoration: BoxDecoration(
           color: kDarkGreen,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 25,
+              offset: const Offset(0, 10),
+            ),
+          ],
         ),
         child: Column(
           children: [
@@ -2330,62 +2354,92 @@ class ReadyToStartSection extends StatelessWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.merriweather(
                 color: Colors.white,
-                fontSize: isMobile ? 32 : 40,
+                fontSize: isMobile ? 36 : 52,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 10),
-            const Text(
+            const SizedBox(height: 16),
+            Text(
               'Secure your spot in the upcoming batch.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white70),
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontSize: isMobile ? 16 : 22,
+              ),
             ),
-            const SizedBox(height: 40),
-            Flex(
-              direction: isMobile ? Axis.vertical : Axis.horizontal,
-              mainAxisAlignment: MainAxisAlignment.center,
+            const SizedBox(height: 48),
+            Wrap(
+              spacing: 20,
+              runSpacing: 20,
+              alignment: WrapAlignment.center,
               children: [
-                SizedBox(
-                  width: isMobile ? double.infinity : null,
-                  child: ElevatedButton(
-                    onPressed: () => onNavigate(2),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: kDarkGreen,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 20,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text('Apply Online'),
-                  ),
+                _buildButton(
+                  'Apply Online',
+                  Colors.white,
+                  kDarkGreen,
+                  () => onNavigate(2),
+                  isMobile,
                 ),
-                SizedBox(width: isMobile ? 0 : 20, height: isMobile ? 15 : 0),
-                SizedBox(
-                  width: isMobile ? double.infinity : null,
-                  child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: const BorderSide(color: Colors.white),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 20,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    child: const Text('Chat on WhatsApp'),
-                  ),
-                ),
+                _buildOutlineButton('Chat on WhatsApp', Colors.white, () async {
+                  const url = 'https://wa.me/923451234567';
+                  if (await canLaunchUrl(Uri.parse(url))) {
+                    await launchUrl(Uri.parse(url));
+                  }
+                }, isMobile),
               ],
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildButton(
+    String text,
+    Color bgColor,
+    Color textColor,
+    VoidCallback onTap,
+    bool isMobile,
+  ) {
+    return ElevatedButton(
+      onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: bgColor,
+        foregroundColor: textColor,
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 30 : 50,
+          vertical: 24,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
+        elevation: 0,
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+      ),
+    );
+  }
+
+  Widget _buildOutlineButton(
+    String text,
+    Color color,
+    VoidCallback onTap,
+    bool isMobile,
+  ) {
+    return OutlinedButton(
+      onPressed: onTap,
+      style: OutlinedButton.styleFrom(
+        foregroundColor: color,
+        side: const BorderSide(color: Colors.white, width: 1.5),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 30 : 50,
+          vertical: 24,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(35)),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
       ),
     );
   }
@@ -2416,7 +2470,7 @@ class GalleryHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.merriweather(
               color: Colors.white,
-              fontSize: isMobile ? 40 : 56,
+              fontSize: isMobile ? 48 : 72,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -2426,7 +2480,7 @@ class GalleryHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: Colors.white.withValues(alpha: 0.9),
-              fontSize: isMobile ? 14 : 18,
+              fontSize: isMobile ? 18 : 22,
               height: 1.5,
             ),
           ),
@@ -2447,8 +2501,8 @@ class GalleryGridSection extends StatelessWidget {
     final visibleItems = galleryItems.where((item) => item.isVisible).toList();
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+        vertical: isMobile ? 60 : 120,
+        horizontal: isMobile ? 24 : 40,
       ),
       child: Wrap(
         spacing: 30,
@@ -2494,8 +2548,8 @@ class ContactHeroSection extends StatelessWidget {
       width: double.infinity,
       color: kPrimaryGreen,
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 80,
-        vertical: 40,
+        horizontal: isMobile ? 24 : 40,
+        vertical: 60,
       ),
       child: Column(
         children: [
@@ -2506,7 +2560,7 @@ class ContactHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.merriweather(
               color: Colors.white,
-              fontSize: isMobile ? 40 : 56,
+              fontSize: isMobile ? 48 : 72,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -2516,7 +2570,7 @@ class ContactHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: Colors.white.withValues(alpha: 0.9),
-              fontSize: isMobile ? 14 : 18,
+              fontSize: isMobile ? 18 : 22,
               height: 1.5,
             ),
           ),
@@ -2542,8 +2596,9 @@ class ContactContentSection extends StatelessWidget {
         direction: isMobile ? Axis.vertical : Axis.horizontal,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: isMobile ? 0 : 1,
+          Flexible(
+            flex: 1,
+            fit: isMobile ? FlexFit.loose : FlexFit.tight,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -2551,7 +2606,7 @@ class ContactContentSection extends StatelessWidget {
                   'Visit Our Campus',
                   style: GoogleFonts.merriweather(
                     color: kPrimaryGreen,
-                    fontSize: isMobile ? 28 : 36,
+                    fontSize: isMobile ? 32 : 48,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -2560,7 +2615,7 @@ class ContactContentSection extends StatelessWidget {
                   'Our doors are always open for students and parents. Come see our state-of-the-art labs, meet our mentors, and feel the energy of innovation.',
                   style: GoogleFonts.inter(
                     color: Colors.black54,
-                    fontSize: isMobile ? 14 : 16,
+                    fontSize: isMobile ? 16 : 20,
                     height: 1.6,
                   ),
                 ),
@@ -2607,8 +2662,9 @@ class ContactContentSection extends StatelessWidget {
           ),
           if (!isMobile) const SizedBox(width: 80),
           if (isMobile) const SizedBox(height: 40),
-          Expanded(
-            flex: isMobile ? 0 : 1,
+          Flexible(
+            flex: 1,
+            fit: isMobile ? FlexFit.loose : FlexFit.tight,
             child: Container(
               padding: EdgeInsets.all(isMobile ? 30 : 50),
               decoration: BoxDecoration(
@@ -2636,7 +2692,7 @@ class ContactContentSection extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.merriweather(
                       color: kDarkGreen,
-                      fontSize: isMobile ? 24 : 32,
+                      fontSize: isMobile ? 28 : 44,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -2646,7 +2702,7 @@ class ContactContentSection extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.black54,
-                      fontSize: isMobile ? 14 : 16,
+                      fontSize: isMobile ? 16 : 20,
                       height: 1.6,
                     ),
                   ),
@@ -2782,7 +2838,7 @@ class DonateHeroSection extends StatelessWidget {
             text: TextSpan(
               style: GoogleFonts.merriweather(
                 color: Colors.white,
-                fontSize: isMobile ? 32 : 56,
+                fontSize: isMobile ? 36 : 64,
                 fontWeight: FontWeight.bold,
                 height: 1.1,
               ),
@@ -2801,7 +2857,7 @@ class DonateHeroSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
               color: Colors.white.withValues(alpha: 0.9),
-              fontSize: isMobile ? 14 : 18,
+              fontSize: isMobile ? 18 : 22,
               height: 1.5,
             ),
           ),
@@ -2820,8 +2876,8 @@ class PillarsSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+        vertical: isMobile ? 60 : 100,
+        horizontal: isMobile ? 24 : 40,
       ),
       child: Wrap(
         spacing: 30,
@@ -2929,8 +2985,9 @@ class TransparencySection extends StatelessWidget {
         direction: isMobile ? Axis.vertical : Axis.horizontal,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: isMobile ? 0 : 1,
+          Flexible(
+            flex: 1,
+            fit: isMobile ? FlexFit.loose : FlexFit.tight,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -2938,7 +2995,7 @@ class TransparencySection extends StatelessWidget {
                   'Our Promise of Transparency',
                   style: GoogleFonts.merriweather(
                     color: kPrimaryGreen,
-                    fontSize: isMobile ? 28 : 36,
+                    fontSize: isMobile ? 32 : 44,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -2947,7 +3004,7 @@ class TransparencySection extends StatelessWidget {
                   'We understand that trust is the foundation of any contribution. At Hunarmand Kashmir, every rupee is accounted for. We operate with a strict policy of ethical allocation.',
                   style: GoogleFonts.inter(
                     color: Colors.black54,
-                    fontSize: isMobile ? 14 : 16,
+                    fontSize: isMobile ? 16 : 20,
                     height: 1.6,
                   ),
                 ),
@@ -2967,8 +3024,9 @@ class TransparencySection extends StatelessWidget {
           ),
           if (!isMobile) const SizedBox(width: 80),
           if (isMobile) const SizedBox(height: 40),
-          Expanded(
-            flex: isMobile ? 0 : 1,
+          Flexible(
+            flex: 1,
+            fit: isMobile ? FlexFit.loose : FlexFit.tight,
             child: Container(
               padding: const EdgeInsets.all(40),
               decoration: BoxDecoration(
@@ -3093,7 +3151,7 @@ class WaysToContributeSection extends StatelessWidget {
             textAlign: TextAlign.center,
             style: GoogleFonts.merriweather(
               color: kPrimaryGreen,
-              fontSize: isMobile ? 28 : 36,
+              fontSize: isMobile ? 32 : 48,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -3236,8 +3294,9 @@ class BankTransferSection extends StatelessWidget {
         child: Flex(
           direction: isMobile ? Axis.vertical : Axis.horizontal,
           children: [
-            Expanded(
-              flex: isMobile ? 0 : 3,
+            Flexible(
+              flex: 3,
+              fit: isMobile ? FlexFit.loose : FlexFit.tight,
               child: Column(
                 crossAxisAlignment: isMobile
                     ? CrossAxisAlignment.center
@@ -3258,7 +3317,7 @@ class BankTransferSection extends StatelessWidget {
                     textAlign: isMobile ? TextAlign.center : TextAlign.start,
                     style: TextStyle(
                       color: Colors.white70,
-                      fontSize: isMobile ? 12 : 14,
+                      fontSize: isMobile ? 16 : 20,
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -3270,8 +3329,9 @@ class BankTransferSection extends StatelessWidget {
               ),
             ),
             if (isMobile) const SizedBox(height: 40),
-            Expanded(
-              flex: isMobile ? 0 : 2,
+            Flexible(
+              flex: 2,
+              fit: isMobile ? FlexFit.loose : FlexFit.tight,
               child: Column(
                 children: [
                   Icon(
@@ -3756,6 +3816,7 @@ class _AdminPanelState extends State<AdminPanel> {
             )
           : null,
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Sidebar (only on desktop)
           if (!isMobile)
