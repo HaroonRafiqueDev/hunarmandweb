@@ -1139,10 +1139,12 @@ class ProgramsSection extends StatelessWidget {
           isMobile
               ? Column(
                   children: visibleCourses
-                      .map((course) => Padding(
-                            padding: const EdgeInsets.only(bottom: 30),
-                            child: _buildCourseCard(course, context),
-                          ))
+                      .map(
+                        (course) => Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: _buildCourseCard(course, context),
+                        ),
+                      )
                       .toList(),
                 )
               : Column(
@@ -1152,15 +1154,30 @@ class ProgramsSection extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Expanded(child: _buildCourseCard(visibleCourses[i], context)),
+                            Expanded(
+                              child: _buildCourseCard(
+                                visibleCourses[i],
+                                context,
+                              ),
+                            ),
                             const SizedBox(width: 30),
                             if (i + 1 < visibleCourses.length)
-                              Expanded(child: _buildCourseCard(visibleCourses[i + 1], context))
+                              Expanded(
+                                child: _buildCourseCard(
+                                  visibleCourses[i + 1],
+                                  context,
+                                ),
+                              )
                             else
                               const Expanded(child: SizedBox()),
                             const SizedBox(width: 30),
                             if (i + 2 < visibleCourses.length)
-                              Expanded(child: _buildCourseCard(visibleCourses[i + 2], context))
+                              Expanded(
+                                child: _buildCourseCard(
+                                  visibleCourses[i + 2],
+                                  context,
+                                ),
+                              )
                             else
                               const Expanded(child: SizedBox()),
                           ],
@@ -1191,6 +1208,7 @@ class ProgramsSection extends StatelessWidget {
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.max,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
@@ -1932,10 +1950,12 @@ class CoursesFeesSection extends StatelessWidget {
           isMobile
               ? Column(
                   children: visibleCourses
-                      .map((course) => Padding(
-                            padding: const EdgeInsets.only(bottom: 40),
-                            child: _buildCourseDetailCard(course, context),
-                          ))
+                      .map(
+                        (course) => Padding(
+                          padding: const EdgeInsets.only(bottom: 40),
+                          child: _buildCourseDetailCard(course, context),
+                        ),
+                      )
                       .toList(),
                 )
               : Column(
@@ -1945,10 +1965,20 @@ class CoursesFeesSection extends StatelessWidget {
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            Expanded(child: _buildCourseDetailCard(visibleCourses[i], context)),
+                            Expanded(
+                              child: _buildCourseDetailCard(
+                                visibleCourses[i],
+                                context,
+                              ),
+                            ),
                             const SizedBox(width: 40),
                             if (i + 1 < visibleCourses.length)
-                              Expanded(child: _buildCourseDetailCard(visibleCourses[i + 1], context))
+                              Expanded(
+                                child: _buildCourseDetailCard(
+                                  visibleCourses[i + 1],
+                                  context,
+                                ),
+                              )
                             else
                               const Expanded(child: SizedBox()),
                           ],
@@ -1964,6 +1994,7 @@ class CoursesFeesSection extends StatelessWidget {
   }
 
   Widget _buildCourseDetailCard(Course course, BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(40),
@@ -1979,6 +2010,7 @@ class CoursesFeesSection extends StatelessWidget {
         ],
       ),
       child: Stack(
+        fit: isMobile ? StackFit.loose : StackFit.expand,
         children: [
           Positioned(
             right: 0,
@@ -1993,6 +2025,7 @@ class CoursesFeesSection extends StatelessWidget {
             ),
           ),
           Column(
+            mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -2025,8 +2058,10 @@ class CoursesFeesSection extends StatelessWidget {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   _badge(course.courseType),
-                  if (course.locationDetail.isNotEmpty) _badge(course.locationDetail),
-                  if (course.remainingSeats.isNotEmpty) BlinkingBadge(text: course.remainingSeats),
+                  if (course.locationDetail.isNotEmpty)
+                    _badge(course.locationDetail),
+                  if (course.remainingSeats.isNotEmpty)
+                    BlinkingBadge(text: course.remainingSeats),
                 ],
               ),
               const SizedBox(height: 15),
@@ -2047,8 +2082,8 @@ class CoursesFeesSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Icon(
-                          Icons.check_circle,
-                          color: kPrimaryGreen,
+                          Icons.check_circle_outline,
+                          color: Colors.green,
                           size: 16,
                         ),
                         const SizedBox(width: 10),
@@ -3779,11 +3814,25 @@ class FooterSection extends StatelessWidget {
                         if (!isMobile)
                           Row(
                             children: [
-                              _socialIcon(Icons.camera_alt),
+                              _socialIcon(
+                                Icons.facebook,
+                                'https://facebook.com/hunarmandkashmir',
+                              ),
                               const SizedBox(width: 15),
-                              _socialIcon(Icons.facebook),
+                              _socialIcon(
+                                Icons.music_note,
+                                'https://tiktok.com/@hunarmandkashmir',
+                              ),
                               const SizedBox(width: 15),
-                              _socialIcon(Icons.alternate_email),
+                              _socialIcon(
+                                Icons.camera_alt,
+                                'https://instagram.com/hunarmandkashmir',
+                              ),
+                              const SizedBox(width: 15),
+                              _socialIcon(
+                                Icons.play_circle_fill,
+                                'https://youtube.com/@hunarmandkashmir',
+                              ),
                             ],
                           ),
                       ],
@@ -3916,11 +3965,25 @@ class FooterSection extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _socialIcon(Icons.camera_alt),
+                    _socialIcon(
+                      Icons.facebook,
+                      'https://facebook.com/hunarmandkashmir',
+                    ),
                     const SizedBox(width: 20),
-                    _socialIcon(Icons.facebook),
+                    _socialIcon(
+                      Icons.music_note,
+                      'https://tiktok.com/@hunarmandkashmir',
+                    ),
                     const SizedBox(width: 20),
-                    _socialIcon(Icons.alternate_email),
+                    _socialIcon(
+                      Icons.camera_alt,
+                      'https://instagram.com/hunarmandkashmir',
+                    ),
+                    const SizedBox(width: 20),
+                    _socialIcon(
+                      Icons.play_circle_fill,
+                      'https://youtube.com/@hunarmandkashmir',
+                    ),
                   ],
                 ),
               ],
@@ -3972,8 +4035,16 @@ class FooterSection extends StatelessWidget {
     );
   }
 
-  Widget _socialIcon(IconData icon) {
-    return Icon(icon, color: Colors.white38, size: 20);
+  Widget _socialIcon(IconData icon, String url) {
+    return InkWell(
+      onTap: () async {
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri);
+        }
+      },
+      child: Icon(icon, color: Colors.white38, size: 20),
+    );
   }
 }
 
