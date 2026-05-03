@@ -18,8 +18,6 @@ import 'features/home/screens/landing_page.dart';
 import 'features/about/screens/about_page.dart';
 import 'features/courses/screens/courses_page.dart';
 
-
-
 void main() {
   // Capture Flutter framework errors
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -30,8 +28,6 @@ void main() {
 
   runApp(const HunarmandKashmirApp());
 }
-
-
 
 class HunarmandKashmirApp extends StatefulWidget {
   const HunarmandKashmirApp({super.key});
@@ -385,12 +381,7 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
 
 // --- Colors ---
 
-
 // --- Pages ---
-
-
-
-
 
 class GalleryPage extends StatelessWidget {
   final Function(int) onNavigate;
@@ -475,16 +466,11 @@ class DonatePage extends StatelessWidget {
 
 // --- Shared Components ---
 
-
-
 // --- Home Sections ---
 
 // --- About Sections ---
 
-
-
 // --- Courses Sections ---
-
 
 // --- Gallery Sections ---
 
@@ -1546,10 +1532,6 @@ class BankTransferSection extends StatelessWidget {
 }
 
 // --- Common Footer & Clipper ---
-
-
-
-
 
 // --- Admin Panel ---
 
@@ -2993,5 +2975,3 @@ class _AdminPanelState extends State<AdminPanel> {
     );
   }
 }
-
-
