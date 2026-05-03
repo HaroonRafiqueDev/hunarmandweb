@@ -1,11 +1,11 @@
 {
-    "name": "hunarmandkashmir",
-    "short_name": "hunarmandkashmir",
+    "name": "Hunarmand Kashmir",
+    "short_name": "Hunarmand Kashmir",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#004D26",
+    "theme_color": "#004D26",
+    "description": "Empowering the youth of Kashmir with modern technical skills.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
