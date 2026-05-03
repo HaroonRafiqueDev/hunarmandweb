@@ -502,7 +502,7 @@ class LandingPage extends StatelessWidget {
           const WhySection(),
           ProgramsSection(courses: courses, onNavigate: onNavigate),
           JourneySection(onNavigate: onNavigate),
-          FooterSection(onNavigate: onNavigate),
+          FooterSection(onNavigate: onNavigate, activeIndex: 0),
         ],
       ),
     );
@@ -524,7 +524,7 @@ class AboutPage extends StatelessWidget {
           const StorySection(),
           const ValuesSection(),
           AboutCTASection(onNavigate: onNavigate),
-          FooterSection(onNavigate: onNavigate),
+          FooterSection(onNavigate: onNavigate, activeIndex: 1),
         ],
       ),
     );
@@ -553,7 +553,7 @@ class CoursesPage extends StatelessWidget {
           const DiscountsSection(),
           const OrphanSupportBanner(),
           ReadyToStartSection(onNavigate: onNavigate),
-          FooterSection(onNavigate: onNavigate),
+          FooterSection(onNavigate: onNavigate, activeIndex: 2),
         ],
       ),
     );
@@ -579,7 +579,7 @@ class GalleryPage extends StatelessWidget {
         children: [
           GalleryHeroSection(onNavigate: onNavigate),
           GalleryGridSection(galleryItems: galleryItems),
-          FooterSection(onNavigate: onNavigate),
+          FooterSection(onNavigate: onNavigate, activeIndex: 3),
         ],
       ),
     );
@@ -603,7 +603,7 @@ class ContactPage extends StatelessWidget {
         children: [
           ContactHeroSection(onNavigate: onNavigate),
           const ContactContentSection(),
-          FooterSection(onNavigate: onNavigate),
+          FooterSection(onNavigate: onNavigate, activeIndex: 4),
         ],
       ),
     );
@@ -634,7 +634,7 @@ class DonatePage extends StatelessWidget {
           const TransparencySection(),
           WaysToContributeSection(donationOptions: donationOptions),
           BankTransferSection(bankDetails: bankDetails),
-          FooterSection(onNavigate: onNavigate),
+          FooterSection(onNavigate: onNavigate, activeIndex: 5),
         ],
       ),
     );
@@ -663,43 +663,53 @@ class TopNavBar extends StatelessWidget {
           child: Row(
             children: [
               Image.asset(
-                'assets/images/logo_white.png',
-                height: isMobile ? 30 : 40,
+                'assets/images/Hunarmand_Kashmir_Eng4x.png',
+                height: isMobile ? 35 : 50,
                 fit: BoxFit.contain,
               ),
             ],
           ),
         ),
         const Spacer(),
-        if (!isMobile) ...[
-          _navLink('Home', index: 0),
-          _navLink('About Us', index: 1),
-          _navLink('Courses', index: 2),
-          _navLink('Gallery', index: 3),
-          _navLink('Contact', index: 4),
-          const SizedBox(width: 20),
-          GestureDetector(
-            onTap: () => onNavigate(5),
-            child: _navButton(
-              'Donate',
-              Icons.favorite,
-              activeIndex == 5 ? kAccentOrange : Colors.transparent,
-              Colors.white,
-              true,
+        if (!isMobile)
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _navLink('Home', index: 0),
+                  _navLink('About Us', index: 1),
+                  _navLink('Courses', index: 2),
+                  _navLink('Gallery', index: 3),
+                  _navLink('Contact', index: 4),
+                  const SizedBox(width: 20),
+                  GestureDetector(
+                    onTap: () => onNavigate(5),
+                    child: _navButton(
+                      'Donate',
+                      Icons.favorite,
+                      activeIndex == 5 ? kAccentOrange : Colors.transparent,
+                      Colors.white,
+                      true,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () => onNavigate(2),
+                    child: _navButton(
+                      'Apply Now',
+                      null,
+                      Colors.white,
+                      kPrimaryGreen,
+                      false,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 10),
-          GestureDetector(
-            onTap: () => onNavigate(2),
-            child: _navButton(
-              'Apply Now',
-              null,
-              Colors.white,
-              kPrimaryGreen,
-              false,
-            ),
-          ),
-        ] else ...[
+          ) else ...[
           GestureDetector(
             onTap: () => onNavigate(5),
             child: _navButton(
@@ -796,7 +806,7 @@ class HeroSection extends StatelessWidget {
       child: Column(
         children: [
           Image.asset(
-            'assets/images/logo_white.png',
+            'assets/images/logo_colored.png',
             height: isMobile ? 80 : 120,
             fit: BoxFit.contain,
           ),
@@ -2906,22 +2916,22 @@ class ContactContentSection extends StatelessWidget {
             const Color(0xFF03A9F4),
           ),
           const SizedBox(height: 40),
-          ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 250),
-            child: Container(
-              width: double.infinity,
-              height: isMobile ? 250 : null,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&q=80',
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-          ),
+          // ConstrainedBox(
+          //   constraints: const BoxConstraints(minHeight: 250),
+          //   child: Container(
+          //     width: double.infinity,
+          //     height: isMobile ? 250 : null,
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.circular(20),
+          //       image: const DecorationImage(
+          //         image: NetworkImage(
+          //           'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&q=80',
+          //         ),
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -3036,8 +3046,9 @@ class ContactContentSection extends StatelessWidget {
     String label,
     String text,
     Color bgColor,
-    Color iconColor,
-  ) {
+    Color iconColor, {
+    int? maxLines,
+  }) {
     return Row(
       children: [
         Container(
@@ -3049,18 +3060,24 @@ class ContactContentSection extends StatelessWidget {
           child: Icon(icon, color: iconColor, size: 20),
         ),
         const SizedBox(width: 20),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-            Text(
-              text,
-              style: const TextStyle(color: Colors.black54, fontSize: 14),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                text,
+                maxLines: maxLines,
+                style: const TextStyle(color: Colors.black54, fontSize: 14),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -3292,96 +3309,92 @@ class TransparencySection extends StatelessWidget {
         vertical: isMobile ? 40 : 80,
         horizontal: isMobile ? 24 : 150,
       ),
-      child: Flex(
-        direction: isMobile ? Axis.vertical : Axis.horizontal,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Flexible(
-            flex: 1,
-            fit: isMobile ? FlexFit.loose : FlexFit.tight,
-            child: Column(
+      child: isMobile
+          ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  'Our Promise of Transparency',
-                  style: GoogleFonts.merriweather(
-                    color: kPrimaryGreen,
-                    fontSize: isMobile ? 32 : 44,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 25),
-                Text(
-                  'We understand that trust is the foundation of any contribution. At Hunarmand Kashmir, every rupee is accounted for. We operate with a strict policy of ethical allocation.',
-                  style: GoogleFonts.inter(
-                    color: Colors.black54,
-                    fontSize: isMobile ? 16 : 20,
-                    height: 1.6,
-                  ),
-                ),
+                _buildTransparencyContent(isMobile),
                 const SizedBox(height: 40),
-                _promiseItem(
-                  '100% of student scholarship funds go directly to training costs.',
-                ),
-                _promiseItem('Regular impact reports sent to all donors.'),
-                _promiseItem(
-                  'Open-door policy: Visit our campus to see your impact in action.',
-                ),
-                _promiseItem(
-                  'Focus on long-term sustainability, not temporary relief.',
-                ),
+                _buildTransparencyUtil(isMobile),
+              ],
+            )
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _buildTransparencyContent(isMobile)),
+                const SizedBox(width: 80),
+                Expanded(child: _buildTransparencyUtil(isMobile)),
               ],
             ),
+    );
+  }
+
+  Widget _buildTransparencyContent(bool isMobile) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Our Promise of Transparency',
+          style: GoogleFonts.merriweather(
+            color: kPrimaryGreen,
+            fontSize: isMobile ? 32 : 44,
+            fontWeight: FontWeight.bold,
           ),
-          if (!isMobile) const SizedBox(width: 80),
-          if (isMobile) const SizedBox(height: 40),
-          Flexible(
-            flex: 1,
-            fit: isMobile ? FlexFit.loose : FlexFit.tight,
-            child: Container(
-              padding: const EdgeInsets.all(40),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 30,
-                    offset: const Offset(0, 15),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Center(
-                    child: Text(
-                      'How Funds Are Utilized',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  _utilBar(
-                    'Student Scholarships & Training',
-                    0.7,
-                    Colors.green,
-                  ),
-                  const SizedBox(height: 25),
-                  _utilBar('Infrastructure & Tools', 0.2, Colors.orange),
-                  const SizedBox(height: 25),
-                  _utilBar(
-                    'Community Outreach & Operations',
-                    0.1,
-                    Colors.blueGrey,
-                  ),
-                ],
-              ),
+        ),
+        const SizedBox(height: 25),
+        Text(
+          'We understand that trust is the foundation of any contribution. At Hunarmand Kashmir, every rupee is accounted for. We operate with a strict policy of ethical allocation.',
+          style: GoogleFonts.inter(
+            color: Colors.black54,
+            fontSize: isMobile ? 16 : 20,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 40),
+        _promiseItem(
+          '100% of student scholarship funds go directly to training costs.',
+        ),
+        _promiseItem('Regular impact reports sent to all donors.'),
+        _promiseItem(
+          'Open-door policy: Visit our campus to see your impact in action.',
+        ),
+        _promiseItem(
+          'Focus on long-term sustainability, not temporary relief.',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTransparencyUtil(bool isMobile) {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.03),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Center(
+            child: Text(
+              'How Funds Are Utilized',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
           ),
+          const SizedBox(height: 40),
+          _utilBar('Student Scholarships & Training', 0.7, Colors.green),
+          const SizedBox(height: 25),
+          _utilBar('Infrastructure & Tools', 0.2, Colors.orange),
+          const SizedBox(height: 25),
+          _utilBar('Community Outreach & Operations', 0.1, Colors.blueGrey),
         ],
       ),
     );
@@ -3416,10 +3429,16 @@ class TransparencySection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            Expanded(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
+            const SizedBox(width: 10),
             Text(
               '${(value * 100).toInt()}%',
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
@@ -3626,99 +3645,100 @@ class BankTransferSection extends StatelessWidget {
           color: kDarkGreen,
           borderRadius: BorderRadius.circular(30),
         ),
-        child: Flex(
-          direction: isMobile ? Axis.vertical : Axis.horizontal,
-          children: [
-            Flexible(
-              flex: 3,
-              fit: isMobile ? FlexFit.loose : FlexFit.tight,
-              child: Column(
-                crossAxisAlignment: isMobile
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.start,
+        child: isMobile
+            ? Column(
                 children: [
-                  Text(
-                    'Direct Bank Transfer',
-                    textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                    style: GoogleFonts.merriweather(
-                      color: Colors.white,
-                      fontSize: isMobile ? 24 : 32,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Text(
-                    'Prefer to transfer directly? You can send your contributions to our registered trust account. Please share the receipt via WhatsApp.',
-                    textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: isMobile ? 16 : 20,
-                    ),
-                  ),
+                  _buildBankInfo(isMobile, context),
                   const SizedBox(height: 40),
-                  _bankRow('Account Name:', bankDetails.accountName, context),
-                  _bankRow('Account No:', bankDetails.accountNo, context),
-                  _bankRow('Bank:', bankDetails.bankName, context),
-                  _bankRow('Branch Code:', bankDetails.branchCode, context),
+                  _buildBankCta(isMobile),
                 ],
-              ),
-            ),
-            if (isMobile) const SizedBox(height: 40),
-            Flexible(
-              flex: 2,
-              fit: isMobile ? FlexFit.loose : FlexFit.tight,
-              child: Column(
+              )
+            : Row(
                 children: [
-                  Icon(
-                    Icons.favorite_border,
-                    color: Colors.white12,
-                    size: isMobile ? 60 : 100,
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    '"Charity does not decrease wealth."',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontStyle: FontStyle.italic,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  SizedBox(
-                    width: isMobile ? double.infinity : null,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: kDarkGreen,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 30,
-                          vertical: 20,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.chat_bubble_outline, size: 18),
-                          SizedBox(width: 10),
-                          Text(
-                            'Contact Finance Team',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  Expanded(flex: 3, child: _buildBankInfo(isMobile, context)),
+                  const SizedBox(width: 40),
+                  Expanded(flex: 2, child: _buildBankCta(isMobile)),
                 ],
               ),
-            ),
-          ],
-        ),
       ),
+    );
+  }
+
+  Widget _buildBankInfo(bool isMobile, BuildContext context) {
+    return Column(
+      crossAxisAlignment: isMobile
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Direct Bank Transfer',
+          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+          style: GoogleFonts.merriweather(
+            color: Colors.white,
+            fontSize: isMobile ? 24 : 32,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 15),
+        Text(
+          'Prefer to transfer directly? You can send your contributions to our registered trust account. Please share the receipt via WhatsApp.',
+          textAlign: isMobile ? TextAlign.center : TextAlign.start,
+          style: TextStyle(color: Colors.white70, fontSize: isMobile ? 16 : 20),
+        ),
+        const SizedBox(height: 40),
+        _bankRow('Account Name:', bankDetails.accountName, context),
+        _bankRow('Account No:', bankDetails.accountNo, context),
+        _bankRow('Bank:', bankDetails.bankName, context),
+        _bankRow('Branch Code:', bankDetails.branchCode, context),
+      ],
+    );
+  }
+
+  Widget _buildBankCta(bool isMobile) {
+    return Column(
+      children: [
+        Icon(
+          Icons.favorite_border,
+          color: Colors.white12,
+          size: isMobile ? 60 : 100,
+        ),
+        const SizedBox(height: 20),
+        const Text(
+          '"Charity does not decrease wealth."',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white70,
+            fontStyle: FontStyle.italic,
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 30),
+        SizedBox(
+          width: isMobile ? double.infinity : null,
+          child: ElevatedButton(
+            onPressed: () {},
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: kDarkGreen,
+              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30),
+              ),
+            ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.chat_bubble_outline, size: 18),
+                SizedBox(width: 10),
+                Text(
+                  'Contact Finance Team',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -3758,7 +3778,12 @@ class BankTransferSection extends StatelessWidget {
 
 class FooterSection extends StatelessWidget {
   final Function(int) onNavigate;
-  const FooterSection({super.key, required this.onNavigate});
+  final int activeIndex;
+  const FooterSection({
+    super.key,
+    required this.onNavigate,
+    this.activeIndex = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -3776,7 +3801,9 @@ class FooterSection extends StatelessWidget {
               return Wrap(
                 spacing: 60,
                 runSpacing: 40,
-                alignment: WrapAlignment.start,
+                alignment: isMobile
+                    ? WrapAlignment.center
+                    : WrapAlignment.start,
                 children: [
                   // Column 1: Brand & About
                   SizedBox(
@@ -3789,8 +3816,8 @@ class FooterSection extends StatelessWidget {
                           : CrossAxisAlignment.start,
                       children: [
                         Image.asset(
-                          'assets/images/logo_white.png',
-                          height: 70,
+                          'assets/images/Hunarmand_Kashmir_Eng4x.png',
+                          height: 80,
                           fit: BoxFit.contain,
                           errorBuilder: (c, e, s) => const Icon(
                             Icons.school,
@@ -3871,23 +3898,28 @@ class FooterSection extends StatelessWidget {
                               const SizedBox(height: 25),
                               _footerLink(
                                 'Our Story',
+                                index: 1,
                                 onTap: () => onNavigate(1),
                               ),
                               _footerLink(
                                 'All Courses',
+                                index: 2,
                                 onTap: () => onNavigate(2),
                               ),
                               _footerLink(
                                 'Gallery',
+                                index: 3,
                                 onTap: () => onNavigate(3),
                               ),
                               _footerLink(
                                 'Contact Us',
+                                index: 4,
                                 onTap: () => onNavigate(4),
                               ),
                               _footerLink(
                                 'Donate Now',
                                 isSpecial: true,
+                                index: 5,
                                 onTap: () => onNavigate(5),
                               ),
                             ],
@@ -3896,7 +3928,7 @@ class FooterSection extends StatelessWidget {
 
                         // Sub-column: Contact Info
                         SizedBox(
-                          width: 220,
+                          width: 300,
                           child: Column(
                             crossAxisAlignment: isMobile
                                 ? CrossAxisAlignment.center
@@ -3923,6 +3955,7 @@ class FooterSection extends StatelessWidget {
                               _contactItem(
                                 Icons.email_outlined,
                                 'salam@hunarmandkashmir.com',
+                                maxLines: 1,
                               ),
                             ],
                           ),
@@ -3998,7 +4031,9 @@ class FooterSection extends StatelessWidget {
     String text, {
     bool isSpecial = false,
     VoidCallback? onTap,
+    int? index,
   }) {
+    bool active = index != null && activeIndex == index;
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: InkWell(
@@ -4006,15 +4041,18 @@ class FooterSection extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            color: isSpecial ? kAccentOrange : Colors.white70,
+            color: active
+                ? kAccentOrange
+                : (isSpecial ? kAccentOrange : Colors.white70),
             fontSize: 14,
+            fontWeight: active ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ),
     );
   }
 
-  Widget _contactItem(IconData icon, String text) {
+  Widget _contactItem(IconData icon, String text, {int? maxLines}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: Row(
@@ -4025,8 +4063,7 @@ class FooterSection extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+              maxLines: maxLines,
               style: const TextStyle(color: Colors.white70, fontSize: 13),
             ),
           ),
@@ -4988,8 +5025,9 @@ class _AdminPanelState extends State<AdminPanel> {
             ElevatedButton(
               onPressed: () {
                 try {
-                  if (urlController.text.isEmpty)
+                  if (urlController.text.isEmpty) {
                     throw 'Image URL cannot be empty';
+                  }
 
                   setState(() {
                     widget.galleryItems.add(
