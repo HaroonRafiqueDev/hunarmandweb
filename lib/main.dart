@@ -262,8 +262,11 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
     branchCode: '0123',
   );
 
-  String _tickerText =
-      "Admissions Open for Batch 5! Secure your seat today. Special discounts for early birds.";
+  List<String> _tickerMessages = [
+    "Admissions Open for Batch 5! Secure your seat today.",
+    "Special discounts for early birds available until June 1st.",
+    "Join our WhatsApp community for daily updates."
+  ];
   int? _tickerTargetIndex = 2; // Default to Courses
 
   @override
@@ -302,9 +305,9 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
           drawer: _buildDrawer(context),
           body: Column(
             children: [
-              if (_tickerText.isNotEmpty)
+              if (_tickerMessages.isNotEmpty)
                 TickerWidget(
-                  text: _tickerText,
+                  text: _tickerMessages.join("  •  "),
                   onTap: _tickerTargetIndex != null
                       ? () => _navigateTo(_tickerTargetIndex!)
                       : null,
@@ -453,12 +456,12 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
           donationOptions: _donationOptions,
           bankDetails: _bankDetails,
           isLoggedIn: _isAdminLoggedIn,
-          tickerText: _tickerText,
+          tickerMessages: _tickerMessages,
           tickerTargetIndex: _tickerTargetIndex,
-          onLogin: (success) => setState(() => _isAdminLoggedIn = success),
-          onUpdateTicker: (newText, newTarget) => setState(() {
-            _tickerText = newText;
-            _tickerTargetIndex = newTarget;
+          onLogin: (status) => setState(() => _isAdminLoggedIn = status),
+          onUpdateTicker: (messages, target) => setState(() {
+            _tickerMessages = messages;
+            _tickerTargetIndex = target;
           }),
           onUpdate: () => setState(() {}),
         );
@@ -4111,10 +4114,10 @@ class AdminPanel extends StatefulWidget {
   final List<DonationOption> donationOptions;
   final BankDetails bankDetails;
   final bool isLoggedIn;
-  final String tickerText;
+  final List<String> tickerMessages;
   final int? tickerTargetIndex;
   final Function(bool) onLogin;
-  final Function(String, int?) onUpdateTicker;
+  final Function(List<String>, int?) onUpdateTicker;
   final VoidCallback onUpdate;
 
   const AdminPanel({
@@ -4125,7 +4128,7 @@ class AdminPanel extends StatefulWidget {
     required this.donationOptions,
     required this.bankDetails,
     required this.isLoggedIn,
-    required this.tickerText,
+    required this.tickerMessages,
     required this.tickerTargetIndex,
     required this.onLogin,
     required this.onUpdateTicker,
@@ -5396,89 +5399,139 @@ class _AdminPanelState extends State<AdminPanel> {
   }
 
   Widget _manageTicker() {
-    final TextEditingController tickerController = TextEditingController(
-      text: widget.tickerText,
-    );
+    // Initial controllers for existing messages
+    List<TextEditingController> controllers = widget.tickerMessages
+        .map((m) => TextEditingController(text: m))
+        .toList();
     int? currentTarget = widget.tickerTargetIndex;
 
     return StatefulBuilder(
       builder: (context, setTickerState) {
         return Padding(
           padding: const EdgeInsets.all(40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Announcement Ticker',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Update the text that scrolls across the very top of the app. Leave empty to hide the ticker.',
-                style: TextStyle(color: Colors.black54),
-              ),
-              const SizedBox(height: 30),
-              TextField(
-                controller: tickerController,
-                maxLines: 2,
-                decoration: const InputDecoration(
-                  labelText: 'Ticker Text',
-                  border: OutlineInputBorder(),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Announcement Ticker',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Target Page (When Ticker is Tapped):',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(4),
+                const SizedBox(height: 20),
+                const Text(
+                  'Add multiple scrolling announcements. They will be displayed at the top of the page separated by bullets.',
+                  style: TextStyle(color: Colors.black54),
                 ),
-                child: DropdownButton<int?>(
-                  value: currentTarget,
-                  isExpanded: true,
-                  underline: const SizedBox(),
-                  items: const [
-                    DropdownMenuItem(
-                      value: null,
-                      child: Text('No Link (Not Clickable)'),
-                    ),
-                    DropdownMenuItem(value: 0, child: Text('Home')),
-                    DropdownMenuItem(value: 1, child: Text('About Us')),
-                    DropdownMenuItem(value: 2, child: Text('Courses')),
-                    DropdownMenuItem(value: 3, child: Text('Gallery')),
-                    DropdownMenuItem(value: 4, child: Text('Contact')),
-                    DropdownMenuItem(value: 5, child: Text('Donate')),
-                  ],
-                  onChanged: (val) => setTickerState(() => currentTarget = val),
-                ),
-              ),
-              const SizedBox(height: 30),
-              ElevatedButton.icon(
-                onPressed: () {
-                  widget.onUpdateTicker(tickerController.text, currentTarget);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Ticker updated successfully'),
+                const SizedBox(height: 30),
+                // List of Messages
+                ...List.generate(controllers.length, (index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: controllers[index],
+                            decoration: InputDecoration(
+                              labelText: 'Message ${index + 1}',
+                              border: const OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.campaign_outlined),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, color: Colors.red),
+                          onPressed: () {
+                            setTickerState(() {
+                              controllers[index].dispose();
+                              controllers.removeAt(index);
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   );
-                },
-                icon: const Icon(Icons.save),
-                label: const Text('Save Ticker'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: kPrimaryGreen,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 15,
+                }),
+                // Add Button
+                OutlinedButton.icon(
+                  onPressed: () {
+                    setTickerState(() {
+                      controllers.add(TextEditingController());
+                    });
+                  },
+                  icon: const Icon(Icons.add),
+                  label: const Text('Add Another Message'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 40),
+                const Text(
+                  'Target Page (When Ticker is Tapped):',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: DropdownButton<int?>(
+                    value: currentTarget,
+                    isExpanded: true,
+                    underline: const SizedBox(),
+                    items: const [
+                      DropdownMenuItem(
+                        value: null,
+                        child: Text('No Link (Not Clickable)'),
+                      ),
+                      DropdownMenuItem(value: 0, child: Text('Home')),
+                      DropdownMenuItem(value: 1, child: Text('About Us')),
+                      DropdownMenuItem(value: 2, child: Text('Courses')),
+                      DropdownMenuItem(value: 3, child: Text('Gallery')),
+                      DropdownMenuItem(value: 4, child: Text('Contact')),
+                      DropdownMenuItem(value: 5, child: Text('Donate')),
+                    ],
+                    onChanged: (val) => setTickerState(() => currentTarget = val),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    // Collect all non-empty messages
+                    List<String> finalMessages = controllers
+                        .map((c) => c.text.trim())
+                        .where((t) => t.isNotEmpty)
+                        .toList();
+                    
+                    widget.onUpdateTicker(finalMessages, currentTarget);
+                    
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Ticker messages updated successfully'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.save),
+                  label: const Text('Save All Changes'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kPrimaryGreen,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 20,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 100), // Extra space for scrolling
+              ],
+            ),
           ),
         );
       },
@@ -5502,9 +5555,10 @@ class _TickerWidgetState extends State<TickerWidget>
   @override
   void initState() {
     super.initState();
+    int seconds = (widget.text.length / 10).clamp(15.0, 90.0).toInt();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 15),
+      duration: Duration(seconds: seconds),
     );
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
@@ -5518,6 +5572,8 @@ class _TickerWidgetState extends State<TickerWidget>
   void didUpdateWidget(TickerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.text != widget.text) {
+      int seconds = (widget.text.length / 10).clamp(15.0, 90.0).toInt();
+      _controller.duration = Duration(seconds: seconds);
       _controller.forward(from: 0.0);
       _controller.repeat();
     }
@@ -5531,38 +5587,30 @@ class _TickerWidgetState extends State<TickerWidget>
 
   @override
   Widget build(BuildContext context) {
+    bool isMobile = Responsive.isMobile(context);
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
         width: double.infinity,
-        height: 40,
-        color: const Color.fromRGBO(
-          242,
-          169,
-          0,
-          1,
-        ), // Aligns perfectly with the TopNavBar theme
+        height: isMobile ? 32 : 40,
+        color: const Color.fromRGBO(242, 169, 0, 1),
         child: ClipRect(
           child: AnimatedBuilder(
             animation: _controller,
             builder: (context, child) {
               return Align(
-                alignment: Alignment(3.0 - (_controller.value * 6.0), 0),
+                alignment: Alignment(4.0 - (_controller.value * 8.0), 0),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    //    color: kAccentOrange,
-                    borderRadius: BorderRadius.circular(20),
+                    vertical: isMobile ? 4 : 6,
                   ),
                   child: Text(
                     widget.text,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                      fontSize: isMobile ? 12 : 14,
                       letterSpacing: 1.2,
                     ),
                     maxLines: 1,
