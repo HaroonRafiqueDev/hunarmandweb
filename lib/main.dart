@@ -15,6 +15,7 @@ class Course {
   String schedule;
   String price;
   String orderNumber;
+  String remainingSeats;
   IconData icon;
   bool isVisible;
 
@@ -31,6 +32,7 @@ class Course {
     this.schedule = '',
     this.price = '',
     this.orderNumber = '01',
+    this.remainingSeats = '',
     required this.icon,
     this.isVisible = true,
   });
@@ -81,6 +83,13 @@ class BankDetails {
 }
 
 void main() {
+  // Capture Flutter framework errors
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    debugPrint('Global Flutter Error: ${details.exception}');
+    debugPrint('Stack trace: ${details.stack}');
+  };
+
   runApp(const HunarmandKashmirApp());
 }
 
@@ -126,6 +135,7 @@ class HunarmandKashmirApp extends StatefulWidget {
 
 class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final ScrollController _scrollController = ScrollController();
   int _currentPageIndex =
       0; // 0: Home, 1: About, 2: Courses, 3: Gallery, 4: Contact, 5: Donate, 6: Admin
   bool _isAdminLoggedIn = false;
@@ -146,6 +156,7 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
       schedule: '4 Days a Week (Mon-Thu)',
       price: 'Rs. 12,000',
       orderNumber: '01',
+      remainingSeats: '5 Seats Left',
     ),
     Course(
       id: '2',
@@ -162,6 +173,7 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
       schedule: '4 Days a Week (Mon-Thu)',
       price: 'Rs. 12,000',
       orderNumber: '02',
+      remainingSeats: '',
     ),
     Course(
       id: '3',
@@ -178,6 +190,7 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
       schedule: '4 Days a Week (Mon-Thu)',
       price: 'Rs. 10,000',
       orderNumber: '03',
+      remainingSeats: '',
     ),
     Course(
       id: '4',
@@ -192,6 +205,7 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
       schedule: 'Weekends (Sat-Sun)',
       price: 'Rs. 8,000',
       orderNumber: '04',
+      remainingSeats: 'Only 2 Seats Left',
     ),
   ];
 
@@ -248,7 +262,21 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
     branchCode: '0123',
   );
 
+  String _tickerText =
+      "Admissions Open for Batch 5! Secure your seat today. Special discounts for early birds.";
+  int? _tickerTargetIndex = 2; // Default to Courses
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   void _navigateTo(int index) {
+    // Always scroll to top first, then switch page
+    if (_scrollController.hasClients) {
+      _scrollController.jumpTo(0);
+    }
     setState(() {
       _currentPageIndex = index;
     });
@@ -272,7 +300,29 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
         builder: (context) => Scaffold(
           key: _scaffoldKey,
           drawer: _buildDrawer(context),
-          body: _buildPage(),
+          body: Column(
+            children: [
+              if (_tickerText.isNotEmpty)
+                TickerWidget(
+                  text: _tickerText,
+                  onTap: _tickerTargetIndex != null
+                      ? () => _navigateTo(_tickerTargetIndex!)
+                      : null,
+                ),
+              Container(
+                color: const Color(0xFF166600), // navbar background
+                padding: EdgeInsets.symmetric(
+                  horizontal: Responsive.isMobile(context) ? 20 : 80,
+                  vertical: 20,
+                ),
+                child: TopNavBar(
+                  onNavigate: _navigateTo,
+                  activeIndex: _currentPageIndex,
+                ),
+              ),
+              Expanded(child: _buildPage()),
+            ],
+          ),
         ),
       ),
     );
@@ -339,7 +389,7 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
       leading: Icon(
         icon,
         color: isSpecial
-            ? kAccentOrange
+            ? const Color.fromRGBO(242, 169, 0, 1)
             : (active ? kAccentOrange : Colors.white),
       ),
       title: Text(
@@ -361,35 +411,64 @@ class _HunarmandKashmirAppState extends State<HunarmandKashmirApp> {
   Widget _buildPage() {
     switch (_currentPageIndex) {
       case 1:
-        return AboutPage(onNavigate: _navigateTo);
+        return AboutPage(
+          key: ValueKey(_currentPageIndex),
+          onNavigate: _navigateTo,
+          scrollController: _scrollController,
+        );
       case 2:
-        return CoursesPage(onNavigate: _navigateTo, courses: _courses);
+        return CoursesPage(
+          key: ValueKey(_currentPageIndex),
+          onNavigate: _navigateTo,
+          courses: _courses,
+          scrollController: _scrollController,
+        );
       case 3:
         return GalleryPage(
+          key: ValueKey(_currentPageIndex),
           onNavigate: _navigateTo,
           galleryItems: _galleryItems,
+          scrollController: _scrollController,
         );
       case 4:
-        return ContactPage(onNavigate: _navigateTo);
+        return ContactPage(
+          key: ValueKey(_currentPageIndex),
+          onNavigate: _navigateTo,
+          scrollController: _scrollController,
+        );
       case 5:
         return DonatePage(
+          key: ValueKey(_currentPageIndex),
           onNavigate: _navigateTo,
           donationOptions: _donationOptions,
           bankDetails: _bankDetails,
+          scrollController: _scrollController,
         );
       case 6:
         return AdminPanel(
+          key: ValueKey(_currentPageIndex),
           onNavigate: _navigateTo,
           courses: _courses,
           galleryItems: _galleryItems,
           donationOptions: _donationOptions,
           bankDetails: _bankDetails,
           isLoggedIn: _isAdminLoggedIn,
+          tickerText: _tickerText,
+          tickerTargetIndex: _tickerTargetIndex,
           onLogin: (success) => setState(() => _isAdminLoggedIn = success),
+          onUpdateTicker: (newText, newTarget) => setState(() {
+            _tickerText = newText;
+            _tickerTargetIndex = newTarget;
+          }),
           onUpdate: () => setState(() {}),
         );
       default:
-        return LandingPage(onNavigate: _navigateTo, courses: _courses);
+        return LandingPage(
+          key: ValueKey(_currentPageIndex),
+          onNavigate: _navigateTo,
+          courses: _courses,
+          scrollController: _scrollController,
+        );
     }
   }
 }
@@ -405,15 +484,18 @@ const Color kLightBg = Color(0xFFF9F9F9);
 class LandingPage extends StatelessWidget {
   final Function(int) onNavigate;
   final List<Course> courses;
+  final ScrollController? scrollController;
   const LandingPage({
     super.key,
     required this.onNavigate,
     required this.courses,
+    this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: scrollController,
       child: Column(
         children: [
           HeroSection(onNavigate: onNavigate, activeIndex: 0),
@@ -429,11 +511,13 @@ class LandingPage extends StatelessWidget {
 
 class AboutPage extends StatelessWidget {
   final Function(int) onNavigate;
-  const AboutPage({super.key, required this.onNavigate});
+  final ScrollController? scrollController;
+  const AboutPage({super.key, required this.onNavigate, this.scrollController});
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: scrollController,
       child: Column(
         children: [
           AboutHeroSection(onNavigate: onNavigate),
@@ -450,20 +534,23 @@ class AboutPage extends StatelessWidget {
 class CoursesPage extends StatelessWidget {
   final Function(int) onNavigate;
   final List<Course> courses;
+  final ScrollController? scrollController;
   const CoursesPage({
     super.key,
     required this.onNavigate,
     required this.courses,
+    this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: scrollController,
       child: Column(
         children: [
           CoursesHeroSection(onNavigate: onNavigate),
-          const DiscountsSection(),
           CoursesFeesSection(courses: courses), // Dynamic grid moved into here
+          const DiscountsSection(),
           const OrphanSupportBanner(),
           ReadyToStartSection(onNavigate: onNavigate),
           FooterSection(onNavigate: onNavigate),
@@ -476,15 +563,18 @@ class CoursesPage extends StatelessWidget {
 class GalleryPage extends StatelessWidget {
   final Function(int) onNavigate;
   final List<GalleryItem> galleryItems;
+  final ScrollController? scrollController;
   const GalleryPage({
     super.key,
     required this.onNavigate,
     required this.galleryItems,
+    this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: scrollController,
       child: Column(
         children: [
           GalleryHeroSection(onNavigate: onNavigate),
@@ -498,11 +588,17 @@ class GalleryPage extends StatelessWidget {
 
 class ContactPage extends StatelessWidget {
   final Function(int) onNavigate;
-  const ContactPage({super.key, required this.onNavigate});
+  final ScrollController? scrollController;
+  const ContactPage({
+    super.key,
+    required this.onNavigate,
+    this.scrollController,
+  });
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: scrollController,
       child: Column(
         children: [
           ContactHeroSection(onNavigate: onNavigate),
@@ -518,16 +614,19 @@ class DonatePage extends StatelessWidget {
   final Function(int) onNavigate;
   final List<DonationOption> donationOptions;
   final BankDetails bankDetails;
+  final ScrollController? scrollController;
   const DonatePage({
     super.key,
     required this.onNavigate,
     required this.donationOptions,
     required this.bankDetails,
+    this.scrollController,
   });
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: scrollController,
       child: Column(
         children: [
           DonateHeroSection(onNavigate: onNavigate),
@@ -687,81 +786,63 @@ class HeroSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
-    return Stack(
-      children: [
-        ClipPath(
-          clipper: HeroClipper(),
-          child: Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Color(0xFF013A1C), Color(0xFF004D26)],
-              ),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 20 : 80,
-              vertical: 40,
-            ),
-            child: Column(
-              children: [
-                TopNavBar(onNavigate: onNavigate, activeIndex: activeIndex),
-                SizedBox(height: isMobile ? 30 : 60),
-                Image.asset(
-                  'assets/images/logo_white.png',
-                  height: isMobile ? 80 : 120,
-                  fit: BoxFit.contain,
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Rooted in Kashmir. Ready for the World.',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.merriweather(
-                    color: Colors.white,
-                    fontSize: isMobile ? 32 : 44,
-                    fontWeight: FontWeight.bold,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  'Empowering the youth of the Valley with cutting-edge digital skills.\nTurning talent into livelihood, and dreams into reality.',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.inter(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: isMobile ? 14 : 18,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Flex(
-                  direction: isMobile ? Axis.vertical : Axis.horizontal,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildButton(
-                      'Explore Our Courses →',
-                      kAccentOrange,
-                      Colors.white,
-                      () => onNavigate(2),
-                    ),
-                    SizedBox(
-                      width: isMobile ? 0 : 20,
-                      height: isMobile ? 15 : 0,
-                    ),
-                    _buildOutlineButton(
-                      'Our Mission',
-                      Colors.white,
-                      () => onNavigate(1),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 60),
-              ],
+    return Container(
+      width: double.infinity,
+      color: const Color(0xFF002B11), // HEROSECTION BACKGROUND COLOR
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 20 : 80,
+        vertical: isMobile ? 40 : 60,
+      ),
+      child: Column(
+        children: [
+          Image.asset(
+            'assets/images/logo_white.png',
+            height: isMobile ? 80 : 120,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'Rooted in Kashmir. Ready for the World.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.merriweather(
+              color: Colors.white,
+              fontSize: isMobile ? 32 : 44,
+              fontWeight: FontWeight.bold,
+              height: 1.2,
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 20),
+          Text(
+            'Empowering the youth of the Valley with cutting-edge digital skills.\nTurning talent into livelihood, and dreams into reality.',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              color: Colors.white.withValues(alpha: 0.9),
+              fontSize: isMobile ? 14 : 18,
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 40),
+          Flex(
+            direction: isMobile ? Axis.vertical : Axis.horizontal,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildButton(
+                'Explore Our Courses →',
+                const Color.fromRGBO(242, 169, 0, 1),
+                Colors.white,
+                () => onNavigate(2),
+              ),
+              SizedBox(width: isMobile ? 0 : 20, height: isMobile ? 15 : 0),
+              _buildOutlineButton(
+                'Our Mission',
+                Colors.white,
+                () => onNavigate(1),
+              ),
+            ],
+          ),
+          const SizedBox(height: 60),
+        ],
+      ),
     );
   }
 
@@ -813,16 +894,16 @@ class WhySection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 40,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Column(
         children: [
-          Image.asset(
-            'assets/images/logo_colored.png',
-            height: isMobile ? 60 : 80,
-            errorBuilder: (c, e, s) =>
-                const Icon(Icons.school, size: 50, color: kPrimaryGreen),
-          ),
+          // Image.asset(
+          //   'assets/images/logo_colored.png',
+          //   height: isMobile ? 60 : 80,
+          //   errorBuilder: (c, e, s) =>
+          //       const Icon(Icons.school, size: 50, color: kPrimaryGreen),
+          // ),
           const SizedBox(height: 30),
           Text(
             'Why Hunarmand Kashmir?',
@@ -846,31 +927,64 @@ class WhySection extends StatelessWidget {
             ),
           ),
           SizedBox(height: isMobile ? 40 : 60),
-          Wrap(
-            spacing: 20,
-            runSpacing: 20,
-            alignment: WrapAlignment.center,
-            children: [
-              _buildFeatureCard(
-                Icons.code,
-                'Expert Mentorship',
-                'Learn from industry professionals\nwho have worked globally.',
-                context,
-              ),
-              _buildFeatureCard(
-                Icons.memory,
-                'Practical Learning',
-                'No boring theory. Work on real\nprojects that build your portfolio.',
-                context,
-              ),
-              _buildFeatureCard(
-                Icons.trending_up,
-                'Career Support',
-                'From resume building to freelance\ngigs, we guide your career path.',
-                context,
-              ),
-            ],
-          ),
+          isMobile
+              ? Column(
+                  children: [
+                    _buildFeatureCard(
+                      Icons.code,
+                      'Expert Mentorship',
+                      'Learn from industry professionals\nwho have worked globally.',
+                      context,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildFeatureCard(
+                      Icons.memory,
+                      'Practical Learning',
+                      'No boring theory. Work on real\nprojects that build your portfolio.',
+                      context,
+                    ),
+                    const SizedBox(height: 20),
+                    _buildFeatureCard(
+                      Icons.trending_up,
+                      'Career Support',
+                      'From resume building to freelance\ngigs, we guide your career path.',
+                      context,
+                    ),
+                  ],
+                )
+              : IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: _buildFeatureCard(
+                          Icons.code,
+                          'Expert Mentorship',
+                          'Learn from industry professionals\nwho have worked globally.',
+                          context,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: _buildFeatureCard(
+                          Icons.memory,
+                          'Practical Learning',
+                          'No boring theory. Work on real\nprojects that build your portfolio.',
+                          context,
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: _buildFeatureCard(
+                          Icons.trending_up,
+                          'Career Support',
+                          'From resume building to freelance\ngigs, we guide your career path.',
+                          context,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
         ],
       ),
     );
@@ -882,9 +996,8 @@ class WhySection extends StatelessWidget {
     String desc,
     BuildContext context,
   ) {
-    bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 300,
+      width: double.infinity,
       padding: const EdgeInsets.all(40),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -950,7 +1063,7 @@ class ProgramsSection extends StatelessWidget {
       color: kLightBg,
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -966,57 +1079,105 @@ class ProgramsSection extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Flex(
-              direction: isMobile ? Axis.vertical : Axis.horizontal,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: isMobile
-                  ? MainAxisAlignment.center
-                  : MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Skills for the Future',
-                  textAlign: isMobile ? TextAlign.center : TextAlign.start,
-                  style: GoogleFonts.merriweather(
-                    color: kPrimaryGreen,
-                    fontSize: isMobile ? 32 : 44,
-                    fontWeight: FontWeight.bold,
+            isMobile
+                ? Column(
+                    children: [
+                      Text(
+                        'Skills for the Future',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.merriweather(
+                          color: kPrimaryGreen,
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      TextButton(
+                        onPressed: () => onNavigate(2),
+                        child: const Text(
+                          'View all courses →',
+                          style: TextStyle(
+                            color: kPrimaryGreen,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Skills for the Future',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.merriweather(
+                            color: kPrimaryGreen,
+                            fontSize: 44,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => onNavigate(2),
+                          child: const Text(
+                            'View all courses →',
+                            style: TextStyle(
+                              color: kPrimaryGreen,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                if (isMobile) const SizedBox(height: 10),
-                TextButton(
-                  onPressed: () => onNavigate(2),
-                  child: const Text(
-                    'View all courses →',
-                    style: TextStyle(
-                      color: kPrimaryGreen,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 40),
           ],
-          Center(
-            child: Wrap(
-              spacing: 30,
-              runSpacing: 30,
-              alignment: WrapAlignment.center,
-              runAlignment: WrapAlignment.center,
-              children: visibleCourses
-                  .map((course) => _buildCourseCard(course, context))
-                  .toList(),
-            ),
-          ),
+          isMobile
+              ? Column(
+                  children: visibleCourses
+                      .map((course) => Padding(
+                            padding: const EdgeInsets.only(bottom: 30),
+                            child: _buildCourseCard(course, context),
+                          ))
+                      .toList(),
+                )
+              : Column(
+                  children: [
+                    for (int i = 0; i < visibleCourses.length; i += 3) ...[
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(child: _buildCourseCard(visibleCourses[i], context)),
+                            const SizedBox(width: 30),
+                            if (i + 1 < visibleCourses.length)
+                              Expanded(child: _buildCourseCard(visibleCourses[i + 1], context))
+                            else
+                              const Expanded(child: SizedBox()),
+                            const SizedBox(width: 30),
+                            if (i + 2 < visibleCourses.length)
+                              Expanded(child: _buildCourseCard(visibleCourses[i + 2], context))
+                            else
+                              const Expanded(child: SizedBox()),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                    ],
+                  ],
+                ),
         ],
       ),
     );
   }
 
   Widget _buildCourseCard(Course course, BuildContext context) {
-    bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 350,
+      width: double.infinity,
       padding: const EdgeInsets.all(30),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1042,27 +1203,38 @@ class ProgramsSection extends StatelessWidget {
                 ),
                 child: Icon(course.icon, color: kPrimaryGreen, size: 24),
               ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: course.courseType == 'Online'
-                      ? Colors.blue.withValues(alpha: 0.1)
-                      : Colors.orange.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  course.courseType,
-                  style: TextStyle(
-                    color: course.courseType == 'Online'
-                        ? Colors.blue
-                        : Colors.orange,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  alignment: WrapAlignment.end,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: course.courseType == 'Online'
+                            ? Colors.blue.withValues(alpha: 0.1)
+                            : Colors.orange.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        course.courseType,
+                        style: TextStyle(
+                          color: course.courseType == 'Online'
+                              ? Colors.blue
+                              : Colors.orange,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    if (course.remainingSeats.isNotEmpty)
+                      BlinkingBadge(text: course.remainingSeats),
+                  ],
                 ),
               ),
             ],
@@ -1116,6 +1288,7 @@ class ProgramsSection extends StatelessWidget {
               ),
             ),
           ),
+          if (!Responsive.isMobile(context)) const Spacer(),
           const SizedBox(height: 20),
           if (course.registrationLink.isNotEmpty)
             SizedBox(
@@ -1153,7 +1326,7 @@ class JourneySection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 60 : 120,
-        horizontal: isMobile ? 24 : 40,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Column(
         children: [
@@ -1215,15 +1388,14 @@ class AboutHeroSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Container(
       width: double.infinity,
-      color: kPrimaryGreen,
+      color: const Color(0xFF002B11),
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 80,
         vertical: 40,
       ),
       child: Column(
         children: [
-          TopNavBar(onNavigate: onNavigate, activeIndex: 1),
-          SizedBox(height: isMobile ? 60 : 100),
+          SizedBox(height: isMobile ? 20 : 40),
           Text(
             'Our Story',
             textAlign: TextAlign.center,
@@ -1330,7 +1502,7 @@ class StorySection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 60 : 100,
-        horizontal: isMobile ? 20 : 80,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Flex(
         direction: isMobile ? Axis.vertical : Axis.horizontal,
@@ -1354,34 +1526,67 @@ class ValuesSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 20 : 80,
-        vertical: isMobile ? 60 : 100,
+        horizontal: isMobile ? 24 : 150,
+        vertical: isMobile ? 80 : 140,
       ),
-      child: Wrap(
-        spacing: 40,
-        runSpacing: 40,
-        alignment: WrapAlignment.center,
-        children: [
-          _buildValueCard(
-            Icons.ads_click,
-            'Our Mission',
-            'To bridge the skills gap in Kashmir by delivering world-class digital training...',
-            context,
-          ),
-          _buildValueCard(
-            Icons.favorite_border,
-            'Our Vision',
-            'A self-reliant Kashmir where every young person has the skills to compete globally...',
-            context,
-          ),
-          _buildValueCard(
-            Icons.people_outline,
-            'Community',
-            'We are more than an Institute; we are a family. We support each other...',
-            context,
-          ),
-        ],
-      ),
+      child: isMobile
+          ? Column(
+              children: [
+                _buildValueCard(
+                  Icons.ads_click,
+                  'Our Mission',
+                  'To bridge the skills gap in Kashmir by delivering world-class digital training...',
+                  context,
+                ),
+                const SizedBox(height: 40),
+                _buildValueCard(
+                  Icons.favorite_border,
+                  'Our Vision',
+                  'A self-reliant Kashmir where every young person has the skills to compete globally...',
+                  context,
+                ),
+                const SizedBox(height: 40),
+                _buildValueCard(
+                  Icons.people_outline,
+                  'Community',
+                  'We are more than an Institute; we are a family. We support each other...',
+                  context,
+                ),
+              ],
+            )
+          : IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _buildValueCard(
+                      Icons.ads_click,
+                      'Our Mission',
+                      'To bridge the skills gap in Kashmir by delivering world-class digital training...',
+                      context,
+                    ),
+                  ),
+                  const SizedBox(width: 40),
+                  Expanded(
+                    child: _buildValueCard(
+                      Icons.favorite_border,
+                      'Our Vision',
+                      'A self-reliant Kashmir where every young person has the skills to compete globally...',
+                      context,
+                    ),
+                  ),
+                  const SizedBox(width: 40),
+                  Expanded(
+                    child: _buildValueCard(
+                      Icons.people_outline,
+                      'Community',
+                      'We are more than an Institute; we are a family. We support each other...',
+                      context,
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -1391,9 +1596,8 @@ class ValuesSection extends StatelessWidget {
     String desc,
     BuildContext context,
   ) {
-    bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 350,
+      width: double.infinity,
       padding: const EdgeInsets.all(40),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1440,7 +1644,7 @@ class AboutCTASection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 24 : 40,
+        horizontal: isMobile ? 24 : 150,
         vertical: isMobile ? 80 : 140,
       ),
       child: Container(
@@ -1501,15 +1705,14 @@ class CoursesHeroSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Container(
       width: double.infinity,
-      color: kPrimaryGreen,
+      color: const Color(0xFF002B11),
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 80,
         vertical: 40,
       ),
       child: Column(
         children: [
-          TopNavBar(onNavigate: onNavigate, activeIndex: 2),
-          SizedBox(height: isMobile ? 60 : 100),
+          SizedBox(height: isMobile ? 20 : 40),
           Text(
             'Start Your Journey',
             textAlign: TextAlign.center,
@@ -1545,7 +1748,7 @@ class LearningChoiceSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Column(
         children: [
@@ -1712,7 +1915,7 @@ class CoursesFeesSection extends StatelessWidget {
       color: kLightBg,
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Column(
         children: [
@@ -1726,22 +1929,43 @@ class CoursesFeesSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 60),
-          Wrap(
-            spacing: 40,
-            runSpacing: 40,
-            children: visibleCourses
-                .map((course) => _buildCourseDetailCard(course, context))
-                .toList(),
-          ),
+          isMobile
+              ? Column(
+                  children: visibleCourses
+                      .map((course) => Padding(
+                            padding: const EdgeInsets.only(bottom: 40),
+                            child: _buildCourseDetailCard(course, context),
+                          ))
+                      .toList(),
+                )
+              : Column(
+                  children: [
+                    for (int i = 0; i < visibleCourses.length; i += 2) ...[
+                      IntrinsicHeight(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(child: _buildCourseDetailCard(visibleCourses[i], context)),
+                            const SizedBox(width: 40),
+                            if (i + 1 < visibleCourses.length)
+                              Expanded(child: _buildCourseDetailCard(visibleCourses[i + 1], context))
+                            else
+                              const Expanded(child: SizedBox()),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                    ],
+                  ],
+                ),
         ],
       ),
     );
   }
 
   Widget _buildCourseDetailCard(Course course, BuildContext context) {
-    bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 500,
+      width: double.infinity,
       padding: const EdgeInsets.all(40),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1795,13 +2019,14 @@ class CoursesFeesSection extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              Row(
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   _badge(course.courseType),
-                  if (course.locationDetail.isNotEmpty) ...[
-                    const SizedBox(width: 10),
-                    _badge(course.locationDetail),
-                  ],
+                  if (course.locationDetail.isNotEmpty) _badge(course.locationDetail),
+                  if (course.remainingSeats.isNotEmpty) BlinkingBadge(text: course.remainingSeats),
                 ],
               ),
               const SizedBox(height: 15),
@@ -1851,6 +2076,7 @@ class CoursesFeesSection extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              if (!Responsive.isMobile(context)) const Spacer(),
               const SizedBox(height: 30),
               _priceRow(
                 course.schedule,
@@ -2003,7 +2229,7 @@ class DiscountsSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 80 : 140,
-        horizontal: isMobile ? 24 : 40,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Container(
         width: double.infinity,
@@ -2076,38 +2302,35 @@ class DiscountsSection extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 80),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.error_outline, color: kAccentOrange, size: 32),
-                const SizedBox(width: 15),
-                Text(
-                  'Important Notes',
-                  style: GoogleFonts.merriweather(
-                    fontSize: isMobile ? 24 : 32,
-                    fontWeight: FontWeight.bold,
-                    color: kDarkGreen,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 40),
-            Wrap(
-              spacing: 30,
-              runSpacing: 20,
-              alignment: WrapAlignment.center,
-              children: [
-                _noteBox(
-                  'Only one discount applies per student.',
-                  context,
-                ),
-                _noteBox(
-                  '30% Advance Fee is required to confirm your booking.',
-                  context,
-                ),
-              ],
-            ),
+            // const SizedBox(height: 80),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.center,
+            //   children: [
+            //     Icon(Icons.error_outline, color: kAccentOrange, size: 32),
+            //     const SizedBox(width: 15),
+            //     Text(
+            //       'Important Notes',
+            //       style: GoogleFonts.merriweather(
+            //         fontSize: isMobile ? 24 : 32,
+            //         fontWeight: FontWeight.bold,
+            //         color: kDarkGreen,
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 40),
+            // Wrap(
+            //   spacing: 30,
+            //   runSpacing: 20,
+            //   alignment: WrapAlignment.center,
+            //   children: [
+            //     _noteBox('Only one discount applies per student.', context),
+            //     _noteBox(
+            //       '30% Advance Fee is required to confirm your booking.',
+            //       context,
+            //     ),
+            //   ],
+            // ),
           ],
         ),
       ),
@@ -2163,33 +2386,33 @@ class DiscountsSection extends StatelessWidget {
     );
   }
 
-  Widget _noteBox(String text, BuildContext context) {
-    bool isMobile = Responsive.isMobile(context);
-    return Container(
-      width: isMobile ? double.infinity : 550,
-      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFEFBE8), // Light Yellow
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.check_circle_outline, color: kAccentOrange, size: 24),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: isMobile ? 16 : 20,
-                color: Colors.black87,
-                height: 1.4,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _noteBox(String text, BuildContext context) {
+  //   bool isMobile = Responsive.isMobile(context);
+  //   return Container(
+  //     width: isMobile ? double.infinity : 550,
+  //     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 25),
+  //     decoration: BoxDecoration(
+  //       color: const Color(0xFFFEFBE8), // Light Yellow
+  //       borderRadius: BorderRadius.circular(16),
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         Icon(Icons.check_circle_outline, color: kAccentOrange, size: 24),
+  //         const SizedBox(width: 20),
+  //         Expanded(
+  //           child: Text(
+  //             text,
+  //             style: TextStyle(
+  //               fontSize: isMobile ? 16 : 20,
+  //               color: Colors.black87,
+  //               height: 1.4,
+  //             ),
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
 class OrphanSupportBanner extends StatelessWidget {
@@ -2200,7 +2423,7 @@ class OrphanSupportBanner extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 24 : 220,
+        horizontal: isMobile ? 24 : 280,
         vertical: 40,
       ),
       child: Container(
@@ -2256,57 +2479,59 @@ class OrphanSupportBanner extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 32),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Support for Orphans',
-                        style: GoogleFonts.merriweather(
-                          color: Colors.white,
-                          fontSize: isMobile ? 28 : 36,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text(
-                            'We provide a ',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: isMobile ? 16 : 20,
-                            ),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Support for Orphans',
+                          style: GoogleFonts.merriweather(
+                            color: Colors.white,
+                            fontSize: isMobile ? 28 : 36,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: kAccentOrange,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              '100% Fee Waiver',
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              'We provide a ',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: isMobile ? 16 : 20,
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: kAccentOrange,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '100% Fee Waiver',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: isMobile ? 18 : 22,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              ' for orphan students.',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.9),
                                 fontSize: isMobile ? 18 : 22,
                               ),
                             ),
-                          ),
-                          Text(
-                            ' for orphan students.',
-                            style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: isMobile ? 18 : 22,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -2327,7 +2552,7 @@ class ReadyToStartSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 24 : 220,
+        horizontal: isMobile ? 24 : 280,
         vertical: 40,
       ),
       child: Container(
@@ -2456,15 +2681,14 @@ class GalleryHeroSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Container(
       width: double.infinity,
-      color: kPrimaryGreen,
+      color: const Color(0xFF002B11),
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 80,
         vertical: 40,
       ),
       child: Column(
         children: [
-          TopNavBar(onNavigate: onNavigate, activeIndex: 3),
-          SizedBox(height: isMobile ? 60 : 100),
+          SizedBox(height: isMobile ? 20 : 40),
           Text(
             'Moments of Hope',
             textAlign: TextAlign.center,
@@ -2502,7 +2726,7 @@ class GalleryGridSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 60 : 120,
-        horizontal: isMobile ? 24 : 40,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Wrap(
         spacing: 30,
@@ -2546,15 +2770,14 @@ class ContactHeroSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Container(
       width: double.infinity,
-      color: kPrimaryGreen,
+      color: const Color(0xFF002B11),
       padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 24 : 40,
-        vertical: 60,
+        horizontal: isMobile ? 20 : 80,
+        vertical: 40,
       ),
       child: Column(
         children: [
-          TopNavBar(onNavigate: onNavigate, activeIndex: 4),
-          SizedBox(height: isMobile ? 60 : 100),
+          SizedBox(height: isMobile ? 20 : 40),
           Text(
             'Get in Touch',
             textAlign: TextAlign.center,
@@ -2587,170 +2810,189 @@ class ContactContentSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isMobile = Responsive.isMobile(context);
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+
+    Widget leftCard = Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(isMobile ? 30 : 50),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+          ),
+        ],
       ),
-      child: Flex(
-        direction: isMobile ? Axis.vertical : Axis.horizontal,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Flexible(
-            flex: 1,
-            fit: isMobile ? FlexFit.loose : FlexFit.tight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Visit Our Campus',
-                  style: GoogleFonts.merriweather(
-                    color: kPrimaryGreen,
-                    fontSize: isMobile ? 32 : 48,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 25),
-                Text(
-                  'Our doors are always open for students and parents. Come see our state-of-the-art labs, meet our mentors, and feel the energy of innovation.',
-                  style: GoogleFonts.inter(
-                    color: Colors.black54,
-                    fontSize: isMobile ? 16 : 20,
-                    height: 1.6,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                _contactInfo(
-                  Icons.location_on,
-                  'Address',
-                  'SCO Software Technology Park, Mirpur',
-                  const Color(0xFFE8F5E9),
-                  const Color(0xFF43A047),
-                ),
-                const SizedBox(height: 20),
-                _contactInfo(
-                  Icons.phone,
-                  'Phone',
-                  '0313 884 0571',
-                  const Color(0xFFE0F2F1),
-                  const Color(0xFF009688),
-                ),
-                const SizedBox(height: 20),
-                _contactInfo(
-                  Icons.chat_bubble_outline,
-                  'WhatsApp',
-                  '0313 884 0571',
-                  const Color(0xFFE1F5FE),
-                  const Color(0xFF03A9F4),
-                ),
-                const SizedBox(height: 40),
-                Container(
-                  height: isMobile ? 250 : 300,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    image: const DecorationImage(
-                      image: NetworkImage(
-                        'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&q=80',
-                      ),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-              ],
+          Text(
+            'Visit Our Campus',
+            style: GoogleFonts.merriweather(
+              color: kPrimaryGreen,
+              fontSize: isMobile ? 32 : 48,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          if (!isMobile) const SizedBox(width: 80),
-          if (isMobile) const SizedBox(height: 40),
-          Flexible(
-            flex: 1,
-            fit: isMobile ? FlexFit.loose : FlexFit.tight,
+          const SizedBox(height: 25),
+          Text(
+            'Our doors are always open for students and parents. Come see our state-of-the-art labs, meet our mentors, and feel the energy of innovation.',
+            style: GoogleFonts.inter(
+              color: Colors.black54,
+              fontSize: isMobile ? 16 : 20,
+              height: 1.6,
+            ),
+          ),
+          const SizedBox(height: 40),
+          _contactInfo(
+            Icons.location_on,
+            'Address',
+            'A.M. Design, Nangi (Behind Bank of Punjab), Allama Iqbal Road, Mirpur, AJK, Pakistan',
+            const Color(0xFFE8F5E9),
+            const Color(0xFF43A047),
+          ),
+          const SizedBox(height: 20),
+          _contactInfo(
+            Icons.phone,
+            'Phone',
+            '0313 884 0571',
+            const Color(0xFFE0F2F1),
+            const Color(0xFF009688),
+          ),
+          const SizedBox(height: 20),
+          _contactInfo(
+            Icons.chat_bubble_outline,
+            'WhatsApp',
+            '0313 884 0571',
+            const Color(0xFFE1F5FE),
+            const Color(0xFF03A9F4),
+          ),
+          const SizedBox(height: 40),
+          ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 250),
             child: Container(
-              padding: EdgeInsets.all(isMobile ? 30 : 50),
+              width: double.infinity,
+              height: isMobile ? 250 : null,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 30,
-                    offset: const Offset(0, 15),
+                borderRadius: BorderRadius.circular(20),
+                image: const DecorationImage(
+                  image: NetworkImage(
+                    'https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=800&q=80',
                   ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.chat_bubble_outline,
-                    size: isMobile ? 60 : 80,
-                    color: kAccentOrange,
-                  ),
-                  const SizedBox(height: 30),
-                  Text(
-                    'Quick Response on WhatsApp',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.merriweather(
-                      color: kDarkGreen,
-                      fontSize: isMobile ? 28 : 44,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    'The fastest way to get in touch with us is via WhatsApp. Our team is online and ready to answer your questions about courses, admissions, and more.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.black54,
-                      fontSize: isMobile ? 16 : 20,
-                      height: 1.6,
-                    ),
-                  ),
-                  const SizedBox(height: 50),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF25D366),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 25),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.chat, size: 24),
-                          SizedBox(width: 15),
-                          Text(
-                            'Contact via WhatsApp',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Typical response time: < 30 mins',
-                    style: TextStyle(
-                      color: Colors.black38,
-                      fontSize: 12,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
         ],
       ),
+    );
+
+    Widget rightCard = Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(isMobile ? 30 : 50),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.chat_bubble_outline,
+            size: isMobile ? 60 : 80,
+            color: kAccentOrange,
+          ),
+          const SizedBox(height: 30),
+          Text(
+            'Quick Response on WhatsApp',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.merriweather(
+              color: kDarkGreen,
+              fontSize: isMobile ? 28 : 44,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Text(
+            'The fastest way to get in touch with us is via WhatsApp. Our team is online and ready to answer your questions about courses, admissions, and more.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black54,
+              fontSize: isMobile ? 16 : 20,
+              height: 1.6,
+            ),
+          ),
+          const SizedBox(height: 50),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {},
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF25D366),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 25),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                elevation: 0,
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.chat, size: 24),
+                  SizedBox(width: 15),
+                  Text(
+                    'Contact via WhatsApp',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Typical response time: < 30 mins',
+            style: TextStyle(
+              color: Colors.black38,
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: isMobile ? 40 : 80,
+        horizontal: isMobile ? 24 : 150,
+      ),
+      child: isMobile
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [leftCard, const SizedBox(height: 40), rightCard],
+            )
+          : IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: leftCard),
+                  const SizedBox(width: 80),
+                  Expanded(child: rightCard),
+                ],
+              ),
+            ),
     );
   }
 
@@ -2801,15 +3043,14 @@ class DonateHeroSection extends StatelessWidget {
     bool isMobile = Responsive.isMobile(context);
     return Container(
       width: double.infinity,
-      color: kPrimaryGreen,
+      color: const Color(0xFF002B11),
       padding: EdgeInsets.symmetric(
         horizontal: isMobile ? 20 : 80,
         vertical: 40,
       ),
       child: Column(
         children: [
-          TopNavBar(onNavigate: onNavigate, activeIndex: 5),
-          const SizedBox(height: 60),
+          SizedBox(height: isMobile ? 20 : 40),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
             decoration: BoxDecoration(
@@ -2877,36 +3118,72 @@ class PillarsSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 60 : 100,
-        horizontal: isMobile ? 24 : 40,
+        horizontal: isMobile ? 24 : 150,
       ),
-      child: Wrap(
-        spacing: 30,
-        runSpacing: 30,
-        alignment: WrapAlignment.center,
-        children: [
-          _pillarCard(
-            Icons.menu_book,
-            'Sponsor Education',
-            'Many talented students in remote villages drop out due to lack of funds. Your donation covers their tuition, software licenses, and learning materials.',
-            const Color(0xFFFFF4E5),
-            context,
-          ),
-          _pillarCard(
-            Icons.group_add,
-            'Empower Mentorship',
-            'We bring in industry experts to mentor our students. Your support helps us organize workshops, hackathons, and career counseling sessions.',
-            const Color(0xFFE8F5E9),
-            context,
-          ),
-          _pillarCard(
-            Icons.shield_outlined,
-            'Create Independence',
-            'We don\'t give handouts; we give hand-ups. Students you support go on to become freelancers and entrepreneurs who support their families.',
-            const Color(0xFFFFF3E0),
-            context,
-          ),
-        ],
-      ),
+      child: isMobile
+          ? Column(
+              children: [
+                _pillarCard(
+                  Icons.menu_book,
+                  'Sponsor Education',
+                  'Many talented students in remote villages drop out due to lack of funds. Your donation covers their tuition, software licenses, and learning materials.',
+                  const Color(0xFFFFF4E5),
+                  context,
+                ),
+                const SizedBox(height: 30),
+                _pillarCard(
+                  Icons.group_add,
+                  'Empower Mentorship',
+                  'We bring in industry experts to mentor our students. Your support helps us organize workshops, hackathons, and career counseling sessions.',
+                  const Color(0xFFE8F5E9),
+                  context,
+                ),
+                const SizedBox(height: 30),
+                _pillarCard(
+                  Icons.shield_outlined,
+                  'Create Independence',
+                  'We don\'t give handouts; we give hand-ups. Students you support go on to become freelancers and entrepreneurs who support their families.',
+                  const Color(0xFFFFF3E0),
+                  context,
+                ),
+              ],
+            )
+          : IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(
+                    child: _pillarCard(
+                      Icons.menu_book,
+                      'Sponsor Education',
+                      'Many talented students in remote villages drop out due to lack of funds. Your donation covers their tuition, software licenses, and learning materials.',
+                      const Color(0xFFFFF4E5),
+                      context,
+                    ),
+                  ),
+                  const SizedBox(width: 30),
+                  Expanded(
+                    child: _pillarCard(
+                      Icons.group_add,
+                      'Empower Mentorship',
+                      'We bring in industry experts to mentor our students. Your support helps us organize workshops, hackathons, and career counseling sessions.',
+                      const Color(0xFFE8F5E9),
+                      context,
+                    ),
+                  ),
+                  const SizedBox(width: 30),
+                  Expanded(
+                    child: _pillarCard(
+                      Icons.shield_outlined,
+                      'Create Independence',
+                      'We don\'t give handouts; we give hand-ups. Students you support go on to become freelancers and entrepreneurs who support their families.',
+                      const Color(0xFFFFF3E0),
+                      context,
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -2917,9 +3194,8 @@ class PillarsSection extends StatelessWidget {
     Color iconBg,
     BuildContext context,
   ) {
-    bool isMobile = Responsive.isMobile(context);
     return Container(
-      width: isMobile ? double.infinity : 350,
+      width: double.infinity,
       padding: const EdgeInsets.all(40),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -2979,7 +3255,7 @@ class TransparencySection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Flex(
         direction: isMobile ? Axis.vertical : Axis.horizontal,
@@ -3142,7 +3418,7 @@ class WaysToContributeSection extends StatelessWidget {
       color: kLightBg,
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Column(
         children: [
@@ -3162,24 +3438,49 @@ class WaysToContributeSection extends StatelessWidget {
             style: TextStyle(color: Colors.black54),
           ),
           const SizedBox(height: 60),
-          Wrap(
-            spacing: 30,
-            runSpacing: 30,
-            alignment: WrapAlignment.center,
-            children: donationOptions
-                .map(
-                  (opt) => _priceCard(
-                    opt.title,
-                    opt.price,
-                    opt.description,
-                    opt.icon,
-                    opt.isPopular ? kAccentOrange : kPrimaryGreen,
-                    context,
-                    isPopular: opt.isPopular,
-                  ),
+          isMobile
+              ? Column(
+                  children: donationOptions
+                      .map(
+                        (opt) => Padding(
+                          padding: const EdgeInsets.only(bottom: 30),
+                          child: _priceCard(
+                            opt.title,
+                            opt.price,
+                            opt.description,
+                            opt.icon,
+                            opt.isPopular ? kAccentOrange : kPrimaryGreen,
+                            context,
+                            isPopular: opt.isPopular,
+                          ),
+                        ),
+                      )
+                      .toList(),
                 )
-                .toList(),
-          ),
+              : IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: donationOptions
+                        .expand(
+                          (opt) => [
+                            Expanded(
+                              child: _priceCard(
+                                opt.title,
+                                opt.price,
+                                opt.description,
+                                opt.icon,
+                                opt.isPopular ? kAccentOrange : kPrimaryGreen,
+                                context,
+                                isPopular: opt.isPopular,
+                              ),
+                            ),
+                            if (opt != donationOptions.last)
+                              const SizedBox(width: 30),
+                          ],
+                        )
+                        .toList(),
+                  ),
+                ),
         ],
       ),
     );
@@ -3194,12 +3495,11 @@ class WaysToContributeSection extends StatelessWidget {
     BuildContext context, {
     bool isPopular = false,
   }) {
-    bool isMobile = Responsive.isMobile(context);
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
-          width: isMobile ? double.infinity : 320,
+          width: double.infinity,
           padding: const EdgeInsets.all(40),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -3283,7 +3583,7 @@ class BankTransferSection extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.symmetric(
         vertical: isMobile ? 40 : 80,
-        horizontal: isMobile ? 20 : 80,
+        horizontal: isMobile ? 24 : 150,
       ),
       child: Container(
         padding: EdgeInsets.all(isMobile ? 30 : 60),
@@ -3565,7 +3865,7 @@ class FooterSection extends StatelessWidget {
                               const SizedBox(height: 25),
                               _contactItem(
                                 Icons.location_on_outlined,
-                                'SCO Software Technology Park, Mirpur',
+                                'A.M. Design, Nangi (Behind Bank of Punjab), Allama Iqbal Road, Mirpur, AJK, Pakistanr',
                               ),
                               _contactItem(
                                 Icons.phone_outlined,
@@ -3662,6 +3962,8 @@ class FooterSection extends StatelessWidget {
           Expanded(
             child: Text(
               text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: Colors.white70, fontSize: 13),
             ),
           ),
@@ -3701,7 +4003,10 @@ class AdminPanel extends StatefulWidget {
   final List<DonationOption> donationOptions;
   final BankDetails bankDetails;
   final bool isLoggedIn;
+  final String tickerText;
+  final int? tickerTargetIndex;
   final Function(bool) onLogin;
+  final Function(String, int?) onUpdateTicker;
   final VoidCallback onUpdate;
 
   const AdminPanel({
@@ -3712,7 +4017,10 @@ class AdminPanel extends StatefulWidget {
     required this.donationOptions,
     required this.bankDetails,
     required this.isLoggedIn,
+    required this.tickerText,
+    required this.tickerTargetIndex,
     required this.onLogin,
+    required this.onUpdateTicker,
     required this.onUpdate,
   });
 
@@ -3829,7 +4137,9 @@ class _AdminPanelState extends State<AdminPanel> {
                 ? _manageGallery()
                 : _activeTab == 2
                 ? _manageDonations()
-                : _manageBank(),
+                : _activeTab == 3
+                ? _manageBank()
+                : _manageTicker(),
           ),
         ],
       ),
@@ -3844,6 +4154,7 @@ class _AdminPanelState extends State<AdminPanel> {
         _sidebarItem(1, Icons.image, 'Manage Gallery'),
         _sidebarItem(2, Icons.favorite, 'Manage Donations'),
         _sidebarItem(3, Icons.account_balance, 'Bank Details'),
+        _sidebarItem(4, Icons.campaign, 'Announcement Ticker'),
         const Spacer(),
         ListTile(
           leading: const Icon(Icons.arrow_back),
@@ -3996,6 +4307,12 @@ class _AdminPanelState extends State<AdminPanel> {
                       opacity: AlwaysStoppedAnimation(
                         item.isVisible ? 1.0 : 0.4,
                       ),
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        color: Colors.grey[200],
+                        child: const Center(
+                          child: Icon(Icons.broken_image, color: Colors.red),
+                        ),
+                      ),
                     ),
                   ),
                   Positioned(
@@ -4057,6 +4374,7 @@ class _AdminPanelState extends State<AdminPanel> {
     final schController = TextEditingController();
     final priceController = TextEditingController();
     final orderController = TextEditingController();
+    final remainingSeatsController = TextEditingController();
     final queryLinkController = TextEditingController();
     List<String> tempSubtitles = [''];
     String tempType = 'Physical';
@@ -4134,6 +4452,12 @@ class _AdminPanelState extends State<AdminPanel> {
                   controller: priceController,
                   decoration: const InputDecoration(
                     labelText: 'Price (e.g. Rs. 12,000)',
+                  ),
+                ),
+                TextField(
+                  controller: remainingSeatsController,
+                  decoration: const InputDecoration(
+                    labelText: 'Remaining Seats (e.g. 5 Seats Left)',
                   ),
                 ),
                 TextField(
@@ -4239,33 +4563,40 @@ class _AdminPanelState extends State<AdminPanel> {
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  widget.courses.add(
-                    Course(
-                      id: DateTime.now().toString(),
-                      title: titleController.text,
-                      subtitles: tempSubtitles
-                          .where((s) => s.isNotEmpty)
-                          .toList(),
-                      registrationLink: linkController.text,
-                      courseType: tempType,
-                      locationDetail: detailController.text,
-                      description: descController.text,
-                      duration: durController.text,
-                      schedule: schController.text,
-                      price: priceController.text,
-                      orderNumber: orderController.text.isEmpty
-                          ? '01'
-                          : orderController.text,
-                      queryLink: queryLinkController.text.isEmpty
-                          ? 'https://wa.me/923451234567'
-                          : queryLinkController.text,
-                      icon: tempIcon,
-                    ),
-                  );
-                });
-                widget.onUpdate();
-                Navigator.pop(context);
+                try {
+                  setState(() {
+                    widget.courses.add(
+                      Course(
+                        id: DateTime.now().toString(),
+                        title: titleController.text,
+                        subtitles: tempSubtitles
+                            .where((s) => s.isNotEmpty)
+                            .toList(),
+                        registrationLink: linkController.text,
+                        courseType: tempType,
+                        locationDetail: detailController.text,
+                        description: descController.text,
+                        duration: durController.text,
+                        schedule: schController.text,
+                        price: priceController.text,
+                        orderNumber: orderController.text.isEmpty
+                            ? '01'
+                            : orderController.text,
+                        remainingSeats: remainingSeatsController.text,
+                        queryLink: queryLinkController.text.isEmpty
+                            ? 'https://wa.me/923451234567'
+                            : queryLinkController.text,
+                        icon: tempIcon,
+                      ),
+                    );
+                  });
+                  widget.onUpdate();
+                  Navigator.pop(context);
+                } catch (e) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text('Error: $e')));
+                }
               },
               child: const Text('Add'),
             ),
@@ -4284,6 +4615,9 @@ class _AdminPanelState extends State<AdminPanel> {
     final schController = TextEditingController(text: course.schedule);
     final priceController = TextEditingController(text: course.price);
     final orderController = TextEditingController(text: course.orderNumber);
+    final remainingSeatsController = TextEditingController(
+      text: course.remainingSeats,
+    );
     final queryLinkController = TextEditingController(text: course.queryLink);
     List<String> tempSubtitles = List.from(course.subtitles);
     if (tempSubtitles.isEmpty) tempSubtitles.add('');
@@ -4355,6 +4689,12 @@ class _AdminPanelState extends State<AdminPanel> {
                 TextField(
                   controller: priceController,
                   decoration: const InputDecoration(labelText: 'Price'),
+                ),
+                TextField(
+                  controller: remainingSeatsController,
+                  decoration: const InputDecoration(
+                    labelText: 'Remaining Seats',
+                  ),
                 ),
                 TextField(
                   controller: linkController,
@@ -4487,37 +4827,130 @@ class _AdminPanelState extends State<AdminPanel> {
     );
   }
 
+  String _processImageUrl(String url) {
+    if (url.contains('drive.google.com')) {
+      final RegExp regExp = RegExp(r'(?:/d/|id=)([a-zA-Z0-9_-]+)');
+      final Match? match = regExp.firstMatch(url);
+      if (match != null && match.groupCount >= 1) {
+        final String? fileId = match.group(1);
+        final directUrl = 'https://drive.google.com/uc?export=view&id=$fileId';
+
+        // Use a Google-provided proxy to bypass CORS issues on Flutter Web
+        final proxiedUrl =
+            'https://images1-focus-opensocial.googleusercontent.com/gadgets/proxy?container=focus&refresh=2592000&url=${Uri.encodeComponent(directUrl)}';
+
+        debugPrint('AdminPanel: Processed GDrive URL (Proxied): $proxiedUrl');
+        return proxiedUrl;
+      }
+    }
+    return url;
+  }
+
   void _addImageDialog() {
     final urlController = TextEditingController();
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Gallery Image'),
-        content: TextField(
-          controller: urlController,
-          decoration: const InputDecoration(labelText: 'Image URL'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                widget.galleryItems.add(
-                  GalleryItem(
-                    id: DateTime.now().toString(),
-                    imageUrl: urlController.text,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Add Gallery Image'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: urlController,
+                decoration: const InputDecoration(
+                  labelText: 'Image URL',
+                  hintText: 'Direct link or Google Drive share link',
+                  helperText:
+                      'For Google Drive, ensure file is set to "Anyone with the link"',
+                  helperStyle: TextStyle(fontSize: 10, color: Colors.blueGrey),
+                ),
+                onChanged: (value) => setDialogState(() {}),
+              ),
+              const SizedBox(height: 20),
+              if (urlController.text.isNotEmpty)
+                Container(
+                  height: 150,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                );
-              });
-              widget.onUpdate();
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(
+                      _processImageUrl(urlController.text),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.broken_image, color: Colors.red),
+                          const SizedBox(height: 8),
+                          const Text(
+                            'Invalid Image URL',
+                            style: TextStyle(color: Colors.red, fontSize: 12),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              final pUrl = _processImageUrl(urlController.text);
+                              if (await canLaunchUrl(Uri.parse(pUrl))) {
+                                await launchUrl(Uri.parse(pUrl));
+                              }
+                            },
+                            child: const Text(
+                              'Verify Link Manually',
+                              style: TextStyle(fontSize: 10),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                try {
+                  if (urlController.text.isEmpty)
+                    throw 'Image URL cannot be empty';
+
+                  setState(() {
+                    widget.galleryItems.add(
+                      GalleryItem(
+                        id: DateTime.now().toString(),
+                        imageUrl: _processImageUrl(urlController.text),
+                      ),
+                    );
+                  });
+                  widget.onUpdate();
+                  debugPrint(
+                    'AdminPanel: Successfully added gallery image: ${urlController.text}',
+                  );
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Image added successfully')),
+                  );
+                } catch (e, stack) {
+                  debugPrint('AdminPanel Error (Add Image): $e');
+                  debugPrint(stack.toString());
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error adding image: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -4569,7 +5002,7 @@ class _AdminPanelState extends State<AdminPanel> {
                             'Popular',
                             style: TextStyle(fontSize: 10),
                           ),
-                          backgroundColor: Colors.amberAccent,
+                          backgroundColor: Color.fromRGBO(255, 215, 64, 1),
                         ),
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.orange),
@@ -4662,18 +5095,30 @@ class _AdminPanelState extends State<AdminPanel> {
           const SizedBox(height: 40),
           ElevatedButton(
             onPressed: () {
-              setState(() {
-                widget.bankDetails.accountName = nameController.text;
-                widget.bankDetails.accountNo = noController.text;
-                widget.bankDetails.bankName = bankController.text;
-                widget.bankDetails.branchCode = branchController.text;
-              });
-              widget.onUpdate();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Bank details updated successfully!'),
-                ),
-              );
+              try {
+                setState(() {
+                  widget.bankDetails.accountName = nameController.text;
+                  widget.bankDetails.accountNo = noController.text;
+                  widget.bankDetails.bankName = bankController.text;
+                  widget.bankDetails.branchCode = branchController.text;
+                });
+                widget.onUpdate();
+                debugPrint('AdminPanel: Successfully updated bank details');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Bank details updated successfully!'),
+                  ),
+                );
+              } catch (e, stack) {
+                debugPrint('AdminPanel Error (Update Bank): $e');
+                debugPrint(stack.toString());
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error updating bank details: $e'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: kPrimaryGreen,
@@ -4739,20 +5184,39 @@ class _AdminPanelState extends State<AdminPanel> {
             ),
             ElevatedButton(
               onPressed: () {
-                setState(() {
-                  widget.donationOptions.add(
-                    DonationOption(
-                      id: DateTime.now().toString(),
-                      title: titleController.text,
-                      price: priceController.text,
-                      description: descController.text,
-                      icon: tempIcon,
-                      isPopular: tempPopular,
+                try {
+                  setState(() {
+                    widget.donationOptions.add(
+                      DonationOption(
+                        id: DateTime.now().toString(),
+                        title: titleController.text,
+                        price: priceController.text,
+                        description: descController.text,
+                        icon: tempIcon,
+                        isPopular: tempPopular,
+                      ),
+                    );
+                  });
+                  widget.onUpdate();
+                  debugPrint(
+                    'AdminPanel: Successfully added donation option: ${titleController.text}',
+                  );
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Donation option added successfully'),
                     ),
                   );
-                });
-                widget.onUpdate();
-                Navigator.pop(context);
+                } catch (e, stack) {
+                  debugPrint('AdminPanel Error (Add Donation): $e');
+                  debugPrint(stack.toString());
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Error adding donation: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
               child: const Text('Add'),
             ),
@@ -4817,6 +5281,238 @@ class _AdminPanelState extends State<AdminPanel> {
               child: const Text('Save'),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _manageTicker() {
+    final TextEditingController tickerController = TextEditingController(
+      text: widget.tickerText,
+    );
+    int? currentTarget = widget.tickerTargetIndex;
+
+    return StatefulBuilder(
+      builder: (context, setTickerState) {
+        return Padding(
+          padding: const EdgeInsets.all(40),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Announcement Ticker',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Update the text that scrolls across the very top of the app. Leave empty to hide the ticker.',
+                style: TextStyle(color: Colors.black54),
+              ),
+              const SizedBox(height: 30),
+              TextField(
+                controller: tickerController,
+                maxLines: 2,
+                decoration: const InputDecoration(
+                  labelText: 'Ticker Text',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Target Page (When Ticker is Tapped):',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: DropdownButton<int?>(
+                  value: currentTarget,
+                  isExpanded: true,
+                  underline: const SizedBox(),
+                  items: const [
+                    DropdownMenuItem(
+                      value: null,
+                      child: Text('No Link (Not Clickable)'),
+                    ),
+                    DropdownMenuItem(value: 0, child: Text('Home')),
+                    DropdownMenuItem(value: 1, child: Text('About Us')),
+                    DropdownMenuItem(value: 2, child: Text('Courses')),
+                    DropdownMenuItem(value: 3, child: Text('Gallery')),
+                    DropdownMenuItem(value: 4, child: Text('Contact')),
+                    DropdownMenuItem(value: 5, child: Text('Donate')),
+                  ],
+                  onChanged: (val) => setTickerState(() => currentTarget = val),
+                ),
+              ),
+              const SizedBox(height: 30),
+              ElevatedButton.icon(
+                onPressed: () {
+                  widget.onUpdateTicker(tickerController.text, currentTarget);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Ticker updated successfully'),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.save),
+                label: const Text('Save Ticker'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: kPrimaryGreen,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 30,
+                    vertical: 15,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class TickerWidget extends StatefulWidget {
+  final String text;
+  final VoidCallback? onTap;
+  const TickerWidget({super.key, required this.text, this.onTap});
+
+  @override
+  State<TickerWidget> createState() => _TickerWidgetState();
+}
+
+class _TickerWidgetState extends State<TickerWidget>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 15),
+    );
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        _controller.forward(from: 0.0);
+        _controller.repeat();
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(TickerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.text != widget.text) {
+      _controller.forward(from: 0.0);
+      _controller.repeat();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Container(
+        width: double.infinity,
+        height: 40,
+        color: const Color.fromRGBO(
+          242,
+          169,
+          0,
+          1,
+        ), // Aligns perfectly with the TopNavBar theme
+        child: ClipRect(
+          child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Align(
+                alignment: Alignment(3.0 - (_controller.value * 6.0), 0),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    //    color: kAccentOrange,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    widget.text,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      letterSpacing: 1.2,
+                    ),
+                    maxLines: 1,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class BlinkingBadge extends StatefulWidget {
+  final String text;
+  const BlinkingBadge({super.key, required this.text});
+
+  @override
+  State<BlinkingBadge> createState() => _BlinkingBadgeState();
+}
+
+class _BlinkingBadgeState extends State<BlinkingBadge>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _controller,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: Colors.red.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.red),
+        ),
+        child: Text(
+          widget.text,
+          style: const TextStyle(
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+            fontSize: 10,
+          ),
         ),
       ),
     );
