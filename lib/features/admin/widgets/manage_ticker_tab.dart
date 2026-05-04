@@ -166,7 +166,7 @@ class _ManageTickerTabState extends State<ManageTickerTab> {
                 ),
               ),
             ),
-            const SizedBox(height: 100), // Extra space for scrolling
+            const SizedBox(height: 100), // more space for scrolling
           ],
         ),
       ),
